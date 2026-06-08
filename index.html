@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>英语大冒险 🗺️ English Adventure</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Helvetica Neue', sans-serif;
+    background: linear-gradient(135deg, #2D1B69 0%, #1A0A3E 50%, #0D0A2E 100%);
+    min-height: 100vh;
+    color: #fff;
+    padding: 20px;
+  }
+  .container { max-width: 800px; margin: 0 auto; }
+
+  /* Hero */
+  .hero {
+    text-align: center;
+    padding: 50px 20px 30px;
+    position: relative;
+  }
+  .hero h1 {
+    font-size: 34px;
+    background: linear-gradient(135deg, #FF6B6B, #FFD93D, #6BCB77, #4D96FF);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+    letter-spacing: 2px;
+  }
+  .hero p {
+    font-size: 15px;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.6;
+  }
+  .hero .badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15);
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.7);
+    margin-top: 12px;
+  }
+
+  /* Day Grid */
+  .day-grid { display: flex; flex-direction: column; gap: 14px; margin-top: 10px; padding-bottom: 40px; }
+
+  .day-card {
+    background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 20px 24px;
+    text-decoration: none;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .day-card:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.25); background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.05) 100%); }
+  .day-card:active { transform: scale(0.98); }
+
+  .day-number {
+    width: 52px; height: 52px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; font-weight: 800;
+    flex-shrink: 0;
+  }
+  .day-info { flex: 1; }
+  .day-info h3 { font-size: 17px; font-weight: 700; margin-bottom: 3px; }
+  .day-info .unit { font-size: 13px; color: rgba(255,255,255,0.5); }
+  .day-info .desc { font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 4px; line-height: 1.4; }
+  .day-arrow { font-size: 20px; color: rgba(255,255,255,0.3); flex-shrink: 0; }
+
+  /* Day Colors */
+  .day-1 .day-number { background: linear-gradient(135deg, #FF6B6B, #EE5A24); }
+  .day-2 .day-number { background: linear-gradient(135deg, #FFD93D, #F9A825); }
+  .day-3 .day-number { background: linear-gradient(135deg, #6BCB77, #2D7D46); }
+  .day-4 .day-number { background: linear-gradient(135deg, #4D96FF, #2563EB); }
+  .day-5 .day-number { background: linear-gradient(135deg, #A855F7, #7C3AED); }
+  .day-6 .day-number { background: linear-gradient(135deg, #F472B6, #DB2777); }
+  .day-7 .day-number { background: linear-gradient(135deg, #60A5FA, #3B82F6); }
+
+  /* Stages */
+  .stages {
+    display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px;
+  }
+  .stage-tag {
+    font-size: 11px; padding: 2px 10px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.5);
+  }
+
+  /* Footer */
+  .footer { text-align: center; padding: 20px 0 40px; font-size: 13px; color: rgba(255,255,255,0.3); }
+  .footer a { color: rgba(255,255,255,0.4); text-decoration: none; }
+
+  @media (max-width: 480px) {
+    body { padding: 12px; }
+    .hero { padding: 30px 10px 20px; }
+    .hero h1 { font-size: 28px; }
+    .day-card { padding: 16px 18px; gap: 14px; }
+    .day-number { width: 44px; height: 44px; font-size: 18px; border-radius: 12px; }
+    .day-info h3 { font-size: 15px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="hero">
+    <h1>🗺️ 英语大冒险</h1>
+    <p>沪教版 5B 下册 · 7天闯关计划</p>
+    <div class="badge">🎯 每天40题 · 每题5秒回顾 · 错题巩固</div>
+  </div>
+
+  <div class="day-grid">
+
+    <a class="day-card day-1" href="Day1_What_a_mess.html">
+      <div class="day-number">1</div>
+      <div class="day-info">
+        <h3>What a mess!</h3>
+        <div class="unit">M1U1 · 物主代词</div>
+        <div class="desc">学习 who / whose / which 的用法</div>
+        <div class="stages">
+          <span class="stage-tag">📝 词汇 17</span>
+          <span class="stage-tag">🔤 语法 13</span>
+          <span class="stage-tag">🎧 听力 5</span>
+          <span class="stage-tag">⚡ Boss 5</span>
+        </div>
+      </div>
+      <div class="day-arrow">→</div>
+    </a>
+
+    <a class="day-card day-2" href="Day2_Watch_it_grow.html">
+      <div class="day-number">2</div>
+      <div class="day-info">
+        <h3>Watch it grow!</h3>
+        <div class="unit">M1U2 · 生命周期</div>
+        <div class="desc">学习 was / were 和生命成长过程</div>
+        <div class="stages">
+          <span class="stage-tag">📝 词汇 17</span>
+          <span class="stage-tag">🔤 语法 13</span>
+          <span class="stage-tag">🎧 听力 5</span>
+          <span class="stage-tag">⚡ Boss 5</span>
+        </div>
+      </div>
+      <div class="day-arrow">→</div>
+    </a>
+
+    <a class="day-card day-3" href="Day3_Listen_Food.html">
+      <div class="day-number">3</div>
+      <div class="day-info">
+        <h3>Listen! Food</h3>
+        <div class="unit">M2U1 · 食物饮料</div>
+        <div class="desc">学习食物、饮料词汇和点餐表达</div>
+        <div class="stages">
+          <span class="stage-tag">📝 词汇 17</span>
+          <span class="stage-tag">🔤 语法 13</span>
+          <span class="stage-tag">🎧 听力 5</span>
+          <span class="stage-tag">⚡ Boss 5</span>
+        </div>
+      </div>
+      <div class="day-arrow">→</div>
+    </a>
+
+    <a class="day-card day-4" href="Day4_Favourite_Things.html">
+      <div class="day-number">4</div>
+      <div class="day-info">
+        <h3>Favourite Things</h3>
+        <div class="unit">M2U2 · 我的最爱</div>
+        <div class="desc">学习 like / love / enjoy 和表达喜好</div>
+        <div class="stages">
+          <span class="stage-tag">📝 词汇 17</span>
+          <span class="stage-tag">🔤 语法 13</span>
+          <span class="stage-tag">🎧 听力 5</span>
+          <span class="stage-tag">⚡ Boss 5</span>
+        </div>
+      </div>
+      <div class="day-arrow">→</div>
+    </a>
+
+    <a class="day-card day-5" href="Day5_Animals_Signs.html">
+      <div class="day-number">5</div>
+      <div class="day-info">
+        <h3>Animals & Signs</h3>
+        <div class="unit">M3U1 · 动物与标识</div>
+        <div class="desc">学习动物名称和公共标识用语</div>
+        <div class="stages">
+          <span class="stage-tag">📝 词汇 17</span>
+          <span class="stage-tag">🔤 语法 13</span>
+          <span class="stage-tag">🎧 听力 5</span>
+          <span class="stage-tag">⚡ Boss 5</span>
+        </div>
+      </div>
+      <div class="day-arrow">→</div>
+    </a>
+
+    <a class="day-card day-6" href="Day6_Weather_Changes.html">
+      <div class="day-number">6</div>
+      <div class="day-info">
+        <h3>Weather Changes</h3>
+        <div class="unit">M3U2 · 天气变化</div>
+        <div class="desc">学习天气词汇和温度表达</div>
+        <div class="stages">
+          <span class="stage-tag">📝 词汇 17</span>
+          <span class="stage-tag">🔤 语法 13</span>
+          <span class="stage-tag">🎧 听力 5</span>
+          <span class="stage-tag">⚡ Boss 5</span>
+        </div>
+      </div>
+      <div class="day-arrow">→</div>
+    </a>
+
+    <a class="day-card day-7" href="Day7_Review.html">
+      <div class="day-number">7</div>
+      <div class="day-info">
+        <h3>📚 Review 复习总结</h3>
+        <div class="unit">全册综合</div>
+        <div class="desc">7天知识点综合回顾 + 错题巩固</div>
+        <div class="stages">
+          <span class="stage-tag">📝 词汇 17</span>
+          <span class="stage-tag">🔤 语法 13</span>
+          <span class="stage-tag">🎧 听力 5</span>
+          <span class="stage-tag">⚡ Boss 5</span>
+        </div>
+      </div>
+      <div class="day-arrow">→</div>
+    </a>
+
+  </div>
+
+  <div class="footer">
+    👶 适合小学五年级 · 沪教版 5B 下册同步练习<br>
+    <a href="https://github.com/dl2012777/english-adventure" target="_blank">📦 GitHub 开源项目</a>
+  </div>
+
+</div>
+</body>
+</html>
