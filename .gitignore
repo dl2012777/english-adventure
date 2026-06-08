@@ -8,3 +8,13 @@ compressed_*.jpg
 *.docx
 __pycache__/
 *.pyc
+bank_data/
+build_days.py
+build_final.py
+batch_build.py
+fill_day3.py
+gen_days.sh
+generate_all.py
+generate_days.py
+package-lock.json
+package.json

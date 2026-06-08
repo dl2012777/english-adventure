@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>英语大冒险 · Day 2 — Watch it grow!</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --c-bg: #F5F0FF; --c-surface: #FFFFFF;
+    --c-primary: #7C5CBF; --c-primary-light: #A78BDB; --c-primary-dark: #5A3D9E;
+    --c-accent: #FF8F5E; --c-accent-light: #FFB088;
+    --c-success: #4CAF50; --c-success-bg: #E8F5E9;
+    --c-error: #EF5350; --c-error-bg: #FBE9E7;
+    --c-text: #2D1B69; --c-text-secondary: #7C6BA0;
+    --c-gold: #FFB300;
+    --radius-sm: 10px; --radius-md: 16px; --radius-lg: 24px;
+    --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  }
+  html, body { height: 100%; overflow: hidden; }
+  body { font-family: var(--font); background: var(--c-bg); color: var(--c-text); display: flex; justify-content: center; align-items: center; -webkit-font-smoothing: antialiased; }
+  .app { width: 100%; height: 100%; max-width: 480px; max-height: 860px; background: var(--c-surface); position: relative; overflow: hidden; box-shadow: 0 0 60px rgba(124,92,191,0.1); display: flex; flex-direction: column; }
+  .hidden { display: none !important; }
+  .flex-center { display: flex; align-items: center; justify-content: center; }
+
+  /* Loading */
+  #loading { position: absolute; inset: 0; z-index: 100; background: linear-gradient(135deg, #7C5CBF, #5A3D9E); flex-direction: column; gap: 24px; transition: opacity 0.5s, transform 0.5s; }
+  #loading.done { opacity: 0; transform: scale(1.05); pointer-events: none; }
+  .loading-icon { width: 80px; height: 80px; border-radius: 50%; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; font-size: 40px; animation: pulse-glow 1.5s ease-in-out infinite; }
+  @keyframes pulse-glow { 0%,100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.3); } 50% { box-shadow: 0 0 30px 10px rgba(255,255,255,0.1); } }
+  .loading-title { color: #fff; font-size: 22px; font-weight: 700; letter-spacing: 2px; }
+  .loading-bar-wrap { width: 220px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 4px; overflow: hidden; }
+  .loading-bar { height: 100%; width: 0; background: #fff; border-radius: 4px; transition: width 0.3s; }
+
+  /* Start */
+  #start { position: absolute; inset: 0; z-index: 90; background: linear-gradient(180deg, #E8DFF7, #F5F0FF 40%, #FFF8F0); flex-direction: column; padding: 40px 24px 32px; text-align: center; }
+  .island-visual { position: relative; width: 200px; height: 160px; margin: 10px auto 0; }
+  .island-cloud { position: absolute; background: #fff; border-radius: 50%; opacity: 0.7; }
+  .island-cloud:nth-child(1) { width: 60px; height: 24px; top: 10px; left: 20px; }
+  .island-cloud:nth-child(2) { width: 80px; height: 28px; top: 30px; right: 10px; }
+  .island-cloud:nth-child(3) { width: 50px; height: 20px; top: 0; right: 50px; }
+  .island-base { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 180px; height: 100px; background: linear-gradient(180deg, #A8D8A8, #7CB87C); border-radius: 50% 50% 40% 40%; }
+  .island-tree { position: absolute; bottom: 70px; left: 50%; transform: translateX(-50%); width: 70px; height: 70px; background: radial-gradient(circle at 50% 60%, #6ABF6A 30%, #4EA84E 70%); border-radius: 50%; }
+  .island-tree::after { content: ''; position: absolute; bottom: -30px; left: 50%; transform: translateX(-50%); width: 12px; height: 30px; background: #8B6B4A; border-radius: 4px; }
+  .island-flag { position: absolute; top: 5px; left: 50%; transform: translateX(-50%); font-size: 28px; }
+  .island-number { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--c-accent); color: #fff; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 800; box-shadow: 0 4px 12px rgba(255,143,94,0.4); z-index: 2; }
+  .day-tag { display: inline-block; background: linear-gradient(135deg, var(--c-primary), var(--c-primary-dark)); color: #fff; padding: 6px 20px; border-radius: 20px; font-size: 14px; font-weight: 600; margin-top: 16px; }
+  .start-title { font-size: 28px; font-weight: 800; margin-top: 12px; background: linear-gradient(135deg, var(--c-primary-dark), var(--c-accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .start-sub { font-size: 15px; color: var(--c-text-secondary); margin-top: 8px; line-height: 1.5; }
+  .start-info { display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap; justify-content: center; }
+  .start-info-item { background: var(--c-bg); padding: 10px 16px; border-radius: var(--radius-sm); font-size: 13px; color: var(--c-text-secondary); display: flex; align-items: center; gap: 6px; }
+  .start-info-item strong { color: var(--c-text); font-weight: 700; }
+  .story-box { margin-top: 16px; padding: 16px; background: #FFF8E1; border-radius: var(--radius-md); border-left: 4px solid var(--c-gold); text-align: left; font-size: 14px; line-height: 1.6; color: #5D4E37; }
+  .story-box em { font-style: normal; color: var(--c-primary-dark); font-weight: 600; }
+  .btn-primary { margin-top: auto; width: 100%; padding: 16px; background: linear-gradient(135deg, var(--c-primary), var(--c-primary-dark)); color: #fff; border: none; border-radius: var(--radius-md); font-size: 18px; font-weight: 700; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; box-shadow: 0 6px 20px rgba(124,92,191,0.3); letter-spacing: 2px; }
+  .btn-primary:active { transform: scale(0.97); }
+
+  /* Game */
+  #game { position: absolute; inset: 0; z-index: 80; background: var(--c-surface); flex-direction: column; }
+
+  /* Top Bar */
+  .topbar { display: flex; align-items: center; padding: 12px 16px 8px; background: var(--c-surface); z-index: 10; }
+  .topbar-stage { font-size: 13px; font-weight: 600; color: var(--c-primary); flex-shrink: 0; display: flex; align-items: center; gap: 6px; }
+  .topbar-score { margin-left: auto; font-size: 14px; font-weight: 700; color: var(--c-accent); display: flex; align-items: center; gap: 4px; }
+  .topbar-streak { font-size: 13px; font-weight: 700; color: var(--c-gold); margin-left: 12px; display: flex; align-items: center; gap: 3px; }
+
+  /* Progress */
+  .progress-wrap { padding: 0 16px 4px; }
+  .progress-track { height: 6px; background: #EDE7F6; border-radius: 6px; overflow: hidden; position: relative; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--c-primary-light), var(--c-primary)); border-radius: 6px; transition: width 0.4s ease; }
+  .progress-label { font-size: 11px; color: var(--c-text-secondary); margin-top: 4px; text-align: right; }
+
+  /* Timer */
+  .timer-wrap { padding: 8px 16px 0; display: flex; align-items: center; gap: 8px; }
+  .timer-bar-track { flex: 1; height: 4px; background: #EDE7F6; border-radius: 4px; overflow: hidden; }
+  .timer-bar-fill { height: 100%; background: var(--c-accent); border-radius: 4px; transition: width 1s linear, background-color 0.3s; }
+  .timer-bar-fill.warning { background: var(--c-error); }
+  .timer-text { font-size: 13px; font-weight: 700; color: var(--c-text); min-width: 32px; text-align: right; font-variant-numeric: tabular-nums; }
+
+  /* Question */
+  .question-area { flex: 1; padding: 0 20px 16px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; }
+  .question-type-tag { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: 600; width: fit-content; }
+  .question-type-tag.vocab { background: #E8F5E9; color: #2E7D32; }
+  .question-type-tag.grammar { background: #FFF3E0; color: #E65100; }
+  .question-type-tag.listening { background: #E3F2FD; color: #1565C0; }
+  .question-type-tag.boss { background: #FCE4EC; color: #C62828; }
+  .question-diff { font-size: 11px; color: var(--c-text-secondary); font-weight: 500; }
+  .question-text { font-size: 18px; font-weight: 600; line-height: 1.5; color: var(--c-text); }
+
+  /* Listening - Play Button & Transcript */
+  .listening-box { background: #F0F7FF; border: 2px solid #BBDEFB; border-radius: var(--radius-md); padding: 14px; margin-bottom: 6px; }
+  .listening-play-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 14px; background: #1565C0; color: #fff; border: none; border-radius: var(--radius-sm); font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.12s; }
+  .listening-play-btn:active { transform: scale(0.97); }
+  .listening-play-btn.playing { background: #FF8F5E; }
+  .listening-play-btn.pulse { animation: pulse-btn 1.5s ease-in-out infinite; }
+  @keyframes pulse-btn { 0%,100%{box-shadow:0 0 0 0 rgba(21,101,192,0.4);} 50%{box-shadow:0 0 0 12px rgba(21,101,192,0);} }
+  .listening-transcript { margin-top: 8px; padding: 10px; background: #fff; border-radius: var(--radius-sm); border: 1px dashed #BBDEFB; font-size: 14px; line-height: 1.6; }
+  .listening-transcript .speaker { font-weight: 700; color: var(--c-primary-dark); }
+
+  /* Options */
+  .options-grid { display: grid; gap: 8px; }
+  .option-btn { width: 100%; padding: 14px 18px; border: 2px solid #E8E0F0; border-radius: var(--radius-sm); background: var(--c-surface); font-size: 17px; font-weight: 600; color: var(--c-text); cursor: pointer; text-align: left; transition: all 0.12s; display: flex; align-items: center; gap: 12px; }
+  .option-btn .opt-label { width: 28px; height: 28px; border-radius: 50%; background: var(--c-bg); color: var(--c-text-secondary); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; transition: all 0.12s; }
+  .option-btn:active { transform: scale(0.98); }
+  .option-btn.correct { border-color: var(--c-success) !important; background: var(--c-success-bg) !important; }
+  .option-btn.correct .opt-label { background: var(--c-success); color: #fff; }
+  .option-btn.wrong { border-color: var(--c-error) !important; background: var(--c-error-bg) !important; }
+  .option-btn.wrong .opt-label { background: var(--c-error); color: #fff; }
+  .option-btn.disabled { pointer-events: none; }
+
+  /* Feedback */
+  .feedback-overlay { position: absolute; inset: 0; z-index: 40; display: none; align-items: center; justify-content: center; pointer-events: none; }
+  .feedback-overlay.show { display: flex; }
+  .feedback-overlay.show .feedback-card { animation: bounceIn 0.4s ease both; }
+  .feedback-card { background: #fff; border-radius: var(--radius-lg); padding: 32px 28px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.15); max-width: 300px; }
+  .feedback-icon { font-size: 48px; margin-bottom: 8px; }
+  .feedback-score { font-size: 28px; font-weight: 800; color: var(--c-accent); }
+  .feedback-detail { font-size: 14px; color: var(--c-text-secondary); margin-top: 4px; }
+  .feedback-explain { margin-top: 12px; padding: 14px; background: #FFF8E1; border-radius: var(--radius-sm); font-size: 14px; line-height: 1.7; color: #2D1B69; text-align: left; font-weight: 600; border-left: 4px solid #FFB300; }
+  .feedback-answer { display: inline-block; margin-top: 8px; padding: 6px 16px; background: #E8F5E9; border-radius: 20px; font-size: 16px; font-weight: 700; color: var(--c-success); }
+  .fb-next-btn { margin-top: 16px; width: 100%; padding: 12px; background: linear-gradient(135deg, var(--c-primary), var(--c-primary-dark)); color: #fff; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; pointer-events: auto; letter-spacing: 1px; }
+  .fb-next-btn:active { transform: scale(0.97); }
+
+  /* Stage Transition */
+  #stage-transition { position: absolute; inset: 0; z-index: 85; background: linear-gradient(135deg, var(--c-primary), var(--c-primary-dark)); flex-direction: column; gap: 12px; text-align: center; transition: opacity 0.4s; }
+  .stage-icon { font-size: 56px; }
+  .stage-name { font-size: 22px; font-weight: 700; color: #fff; }
+  .stage-desc { font-size: 14px; color: rgba(255,255,255,0.8); }
+
+  /* Results */
+  #results { position: absolute; inset: 0; z-index: 95; background: linear-gradient(180deg, #E8DFF7, #FFF8F0); flex-direction: column; padding: 32px 24px 24px; overflow-y: auto; }
+  .result-header { text-align: center; }
+  .result-emoji { font-size: 64px; margin-bottom: 4px; }
+  .result-title { font-size: 26px; font-weight: 800; color: var(--c-text); }
+  .result-sub { font-size: 15px; color: var(--c-text-secondary); margin-top: 4px; }
+  .result-score-card { background: #fff; border-radius: var(--radius-lg); padding: 24px; margin-top: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+  .score-big { font-size: 52px; font-weight: 800; color: var(--c-primary); text-align: center; line-height: 1; }
+  .score-label { font-size: 13px; color: var(--c-text-secondary); text-align: center; margin-top: 4px; }
+  .result-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+  .stat-item { text-align: center; padding: 12px; background: var(--c-bg); border-radius: var(--radius-sm); }
+  .stat-number { font-size: 22px; font-weight: 800; color: var(--c-text); }
+  .stat-label { font-size: 12px; color: var(--c-text-secondary); margin-top: 2px; }
+  .result-breakdown { margin-top: 16px; }
+  .result-breakdown-title { font-size: 14px; font-weight: 700; color: var(--c-text); margin-bottom: 8px; }
+  .breakdown-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: #fff; border-radius: var(--radius-sm); margin-bottom: 6px; font-size: 14px; }
+  .breakdown-row .b-label { color: var(--c-text-secondary); }
+  .breakdown-row .b-score { font-weight: 700; }
+  .breakdown-row .b-score.correct { color: var(--c-success); }
+  .breakdown-row .b-score.total { color: var(--c-primary); }
+  .breakdown-row .b-pct { font-size: 12px; color: var(--c-text-secondary); }
+  .result-rank { margin-top: 16px; padding: 14px; border-radius: var(--radius-md); background: linear-gradient(135deg, #FFF8E1, #FFF3E0); text-align: center; font-size: 14px; color: #795548; }
+
+  .result-actions { margin-top: auto; display: flex; gap: 12px; padding-top: 16px; }
+  .btn-secondary { flex: 1; padding: 14px; border: 2px solid var(--c-primary); border-radius: var(--radius-md); background: transparent; color: var(--c-primary); font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.15s; }
+  .btn-secondary:active { background: var(--c-bg); }
+  .btn-primary-small { flex: 2; padding: 14px; border: none; border-radius: var(--radius-md); background: linear-gradient(135deg, var(--c-primary), var(--c-primary-dark)); color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; letter-spacing: 2px; }
+
+  /* Reorder */
+  .reorder-area { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 0; min-height: 50px; }
+  .reorder-chip { padding: 10px 18px; background: var(--c-bg); border: 2px solid var(--c-primary-light); border-radius: 20px; font-size: 16px; font-weight: 600; color: var(--c-primary-dark); cursor: pointer; transition: all 0.15s; user-select: none; }
+  .reorder-chip:active { transform: scale(0.93); }
+  .reorder-chip.used { opacity: 0.3; pointer-events: none; background: #EDE7F6; }
+  .reorder-slot-word { display: inline-block; padding: 8px 14px; background: var(--c-primary); color: #fff; border-radius: 14px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.15s; margin: 3px; }
+  .reorder-slot-word:active { transform: scale(0.93); }
+  .reorder-check-btn { width: 100%; padding: 12px; background: var(--c-primary); color: #fff; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; }
+
+  /* Animations */
+  @keyframes fadeInUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+  @keyframes bounceIn { 0%{transform:scale(0.3);opacity:0;} 50%{transform:scale(1.05);} 70%{transform:scale(0.95);} 100%{transform:scale(1);opacity:1;} }
+  .anim-bounce { animation: bounceIn 0.5s ease both; }
+
+  .question-area::-webkit-scrollbar, #results::-webkit-scrollbar { width: 4px; }
+  .question-area::-webkit-scrollbar-thumb, #results::-webkit-scrollbar-thumb { background: #D0C8E0; border-radius: 4px; }
+
+  @media (max-width:480px) {
+    .start-title { font-size: 24px; }
+    .question-text { font-size: 18px; }
+    .option-btn { font-size: 15px; padding: 12px 14px; }
+    .score-big { font-size: 42px; }
+  }
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+<div id="loading" class="flex-center">
+  <div class="loading-icon">🗺️</div>
+  <div class="loading-title">英语大冒险</div>
+  <div class="loading-bar-wrap"><div class="loading-bar" id="loading-bar"></div></div>
+  <div style="color:rgba(255,255,255,0.6);font-size:13px;" id="loading-text">准备出发…</div>
+</div>
+
+<div id="start" class="flex-center hidden">
+  <div class="day-tag">📅 <span id="day-tag-text">Day 2 · 下册</span></div>
+  <div class="island-visual">
+    <div class="island-cloud"></div><div class="island-cloud"></div><div class="island-cloud"></div>
+    <div class="island-base"></div><div class="island-tree"></div>
+    <div class="island-flag">🐛</div><div class="island-number">2</div>
+  </div>
+  <div class="start-title" id="start-title">Watch it grow!</div>
+  <div class="start-sub" id="start-sub">生命周期 · 一般过去时 was/were</div>
+  <div class="start-info">
+    <span class="start-info-item">⏱ <strong>25</strong> 分钟</span>
+    <span class="start-info-item">📝 <strong>40</strong> 题</span>
+    <span class="start-info-item">🏆 <strong>4</strong> 关</span>
+  </div>
+  <div class="story-box">
+    📖 今天你观察一只蝴蝶的成长过程——从一个小小的卵开始，变成毛毛虫，再变成蛹，最后变成美丽的蝴蝶！<em>"It was an egg. Now it is a caterpillar."</em><br><br>
+    🎧 <strong>4 关闯关！</strong>词汇 + 语法 + 听力 + Boss。
+  </div>
+  <button class="btn-primary" id="start-btn">🚀 开始冒险</button>
+</div>
+
+<div id="stage-transition" class="flex-center hidden">
+  <div class="stage-icon" id="stg-icon">📝</div>
+  <div class="stage-name" id="stg-name">词汇闯关</div>
+  <div class="stage-desc" id="stg-desc">10 道题</div>
+  <div style="margin-top:12px;color:rgba(255,255,255,0.5);font-size:13px;animation:fadeIn 0.8s 0.5s both;" id="stg-hint">准备好了吗？</div>
+</div>
+
+<div id="game" class="flex-center hidden">
+  <div class="topbar">
+    <div class="topbar-stage"><span id="stage-badge">📝</span> <span id="stage-name-bar">词汇</span></div>
+    <div class="topbar-score" id="top-score">⭐ 0</div>
+    <div class="topbar-streak" id="top-streak">🔥 0</div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+    <div class="progress-label" id="progress-label">1 / 40</div>
+  </div>
+  <div class="timer-wrap">
+    <span style="font-size:13px;color:var(--c-text-secondary)">⏱</span>
+    <div class="timer-bar-track"><div class="timer-bar-fill" id="timer-fill" style="width:100%"></div></div>
+    <div class="timer-text" id="timer-text">30</div>
+  </div>
+  <div class="question-area" id="question-area">
+    <div>
+      <span class="question-type-tag" id="q-type-tag">词汇题</span>
+      <span class="question-diff" id="q-diff">· 简单</span>
+    </div>
+    <div id="q-container">
+      <div class="question-text" id="q-text">Loading…</div>
+    </div>
+    <div class="options-grid" id="options-grid"></div>
+  </div>
+  <div class="feedback-overlay" id="feedback-overlay">
+      <div class="feedback-card">
+        <div class="feedback-icon" id="fb-icon">✅</div>
+        <div class="feedback-score" id="fb-score">+100</div>
+        <div class="feedback-extra hidden" id="fb-audio-text" style="font-size:14px;color:var(--c-text);padding:10px 12px;background:#E3F2FD;border-radius:10px;margin:8px 0 4px;line-height:1.6;"></div>
+        <div class="feedback-extra hidden" id="fb-question-text" style="font-size:15px;color:var(--c-text);padding:8px 12px;background:#F5F0FF;border-radius:10px;margin:4px 0 4px;"></div>
+        <div class="feedback-answer hidden" id="fb-answer"></div>
+        <div class="feedback-detail" id="fb-detail"></div>
+        <div class="feedback-explain hidden" id="fb-explain"></div>
+        <button class="fb-next-btn hidden" id="fb-next-btn" style="margin-top:12px;">下一题 →</button>
+      </div>
+  </div>
+</div>
+
+<div id="results" class="flex-center hidden">
+  <div class="result-header">
+    <div class="result-emoji" id="result-emoji">🏆</div>
+    <div class="result-title" id="result-title">闯关完成！</div>
+    <div class="result-sub" id="result-sub">Day 2 · What a mess!</div>
+  </div>
+  <div class="result-score-card">
+    <div class="score-big" id="result-total-score">0</div>
+    <div class="score-label">总得分</div>
+    <div class="result-stats">
+      <div class="stat-item"><div class="stat-number" id="result-accuracy">0%</div><div class="stat-label">准确率</div></div>
+      <div class="stat-item"><div class="stat-number" id="result-streak">0</div><div class="stat-label">最高连击</div></div>
+    </div>
+  </div>
+  <div class="result-breakdown">
+    <div class="result-breakdown-title">📊 关卡详情</div>
+    <div class="breakdown-row"><span class="b-label">📝 词汇闯关</span><span class="b-score correct" id="r-vocab">0/0</span><span class="b-pct" id="r-vocab-pct"></span></div>
+    <div class="breakdown-row"><span class="b-label">🔤 语法迷宫</span><span class="b-score correct" id="r-grammar">0/0</span><span class="b-pct" id="r-grammar-pct"></span></div>
+    <div class="breakdown-row"><span class="b-label">🎧 听力挑战</span><span class="b-score correct" id="r-listening">0/0</span><span class="b-pct" id="r-listening-pct"></span></div>
+    <div class="breakdown-row"><span class="b-label">⚡ Boss 关</span><span class="b-score correct" id="r-boss">0/0</span><span class="b-pct" id="r-boss-pct"></span></div>
+    <div class="breakdown-row" style="background:var(--c-bg)"><span class="b-label" style="font-weight:700;">🏆 总计</span><span class="b-score total" id="r-total-detail">0 分</span><span class="b-pct" id="r-total-pct"></span></div>
+  </div>
+  <div class="result-rank">💡 持续 40 天打卡，Final Boss 得分 ×3！</div>
+  <div class="result-redo hidden" id="result-redo-area" style="margin-top:12px;padding:14px;border-radius:var(--radius-md);background:#FFF8E1;text-align:center;">
+    <div style="font-size:14px;font-weight:600;color:#795548;margin-bottom:8px;">📝 有 <span id="wrong-count">0</span> 道题答错了</div>
+    <button class="btn-primary-small" id="redo-btn" style="padding:12px 24px;font-size:15px;">🔄 重做错题</button>
+  </div>
+  <div class="result-actions">
+    <button class="btn-secondary" id="restart-btn">🔄 重来</button>
+    <button class="btn-primary-small" id="next-btn">📅 Day 3 预告</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+// ============================================================
+//  DAY 2 — 5B M1U1 "What a mess!" 题库 + 辅助函数
+//  4 Stages: vocab(17) → grammar(13) → listening(6) → boss(4) = 40题
+//  含 50% 冗余 → 每次随机抽取
+// ============================================================
+
+// ---------- 辅助函数 ----------
+function shuffleArr(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+function pickQ(pool,n){if(!pool||pool.length===0)return[];return shuffleArr(pool).slice(0,Math.min(n,pool.length));}
+
+// ---------- Day 1 题库 ----------
+const DAY2_BANK = {
+  title:"Watch it grow! · 生命周期 一般过去时 was/were",
+  vocab: [
+    { subtype:'en2cn',difficulty:'easy',question:'"egg" 的中文是？',options:['卵/蛋','幼虫','蛹','蝴蝶'],answer:0,explanation:'egg = 卵。A butterfly lays an egg.' },
+    { subtype:'en2cn',difficulty:'easy',question:'"caterpillar" 的中文是？',options:['毛毛虫','蝴蝶','卵','蛹'],answer:0,explanation:'caterpillar = 毛毛虫。The caterpillar eats leaves.' },
+    { subtype:'en2cn',difficulty:'easy',question:'"cocoon" 的中文是？',options:['茧','卵','幼虫','蝴蝶'],answer:0,explanation:'cocoon = 茧。The caterpillar makes a cocoon.' },
+    { subtype:'en2cn',difficulty:'easy',question:'"butterfly" 的中文是？',options:['蝴蝶','毛毛虫','蛾','蜻蜓'],answer:0,explanation:'butterfly = 蝴蝶。A butterfly has beautiful wings.' },
+    { subtype:'cn2en',difficulty:'medium',question:'"成长/长大" 用英语怎么说？',options:['grow','fly','change','become'],answer:0,explanation:'grow = 成长。' },
+    { subtype:'cn2en',difficulty:'medium',question:'"变成/成为" 用英语怎么说？',options:['become','begin','belong','because'],answer:0,explanation:'become = 变成。' },
+    { subtype:'en2cn',difficulty:'medium',question:'"change" 的中文是？',options:['变化','成长','变成','移动'],answer:0,explanation:'change = 变化。' },
+    { subtype:'cn2en',difficulty:'hard',question:'"孵化/破壳而出" 用英语怎么说？',options:['hatch','catch','match','patch'],answer:0,explanation:'hatch = 孵化。' },
+    { subtype:'en2cn',difficulty:'medium',question:'"wing" 的中文是？',options:['翅膀','国王','风','获胜'],answer:0,explanation:'wing = 翅膀。' },
+    { subtype:'en2cn',difficulty:'easy',question:'"leaf/leaves" 的中文是？',options:['叶子','离开','生活','学习'],answer:0,explanation:'leaf = 叶子。' },
+    { subtype:'en2cn',difficulty:'easy',question:'"was" 的中文是？',options:['是（过去）','是（现在）','有（过去）','有（现在）'],answer:0,explanation:'was = am/is 的过去式。' },
+    { subtype:'en2cn',difficulty:'easy',question:'"were" 的中文是？',options:['是（过去/复数）','是（现在/复数）','有（过去）','是（过去/单数）'],answer:0,explanation:'were = are 的过去式。' },
+    { subtype:'cn2en',difficulty:'medium',question:'"小/幼小的" 用英语怎么说？',options:['small','big','tall','short'],answer:0,explanation:'small = 小的。' },
+    { subtype:'cn2en',difficulty:'medium',question:'"美丽的" 用英语怎么说？',options:['beautiful','big','busy','boring'],answer:0,explanation:'beautiful = 美丽的。' },
+    { subtype:'en2cn',difficulty:'medium',question:'"pupa" 的中文是？',options:['蛹','幼虫','卵','蝴蝶'],answer:0,explanation:'pupa = 蛹。' },
+    { subtype:'en2cn',difficulty:'easy',question:'"eat" 的中文是？',options:['吃','喝','咬','吞'],answer:0,explanation:'eat = 吃。' },
+    { subtype:'en2cn',difficulty:'hard',question:'"life cycle" 的中文是？',options:['生命周期','生活圈','生命线','生活周期'],answer:0,explanation:'life cycle = 生命周期。' },
+    { subtype:'en2cn',difficulty:'easy',question:'"larva" 的中文是？',options:['幼虫','成虫','蛹','卵'],answer:0,explanation:'larva = 幼虫。' },
+    { subtype:'cn2en',difficulty:'hard',question:'"产卵" 用英语怎么说？',options:['lay an egg','take an egg','make an egg','give an egg'],answer:0,explanation:'lay an egg = 产卵。' },
+    { subtype:'cn2en',difficulty:'medium',question:'"变成" 用英语怎么说？',options:['turn into','turn on','turn off','turn up'],answer:0,explanation:'turn into = 变成。' },
+    { subtype:'en2cn',difficulty:'easy',question:'"now" 的中文是？',options:['现在','那时','以后','之前'],answer:0,explanation:'now = 现在。' },
+    { subtype:'en2cn',difficulty:'hard',question:'"moth" 的中文是？',options:['蛾','蝴蝶','蜜蜂','苍蝇'],answer:0,explanation:'moth = 蛾。' },
+    { subtype:'spelling',difficulty:'hard',question:'补全: c _ t _ _ p _ l _ r (毛毛虫)',options:['caterpillar','caterpiller','catarpillar','caterpilar'],answer:0,explanation:'caterpillar = c-a-t-e-r-p-i-l-l-a-r' },
+    { subtype:'spelling',difficulty:'hard',question:'补全: b _ t t _ _ f l _ (蝴蝶)',options:['butterfly','buterfly','butterfley','butterflie'],answer:0,explanation:'butterfly = b-u-t-t-e-r-f-l-y' },
+    { subtype:'spelling',difficulty:'hard',question:'补全: c _ c _ _ n (茧)',options:['cocoon','cocon','cocone','cocoonn'],answer:0,explanation:'cocoon = c-o-c-o-o-n' },
+    { subtype:'spelling',difficulty:'hard',question:'补全: b _ c _ m _ (变成)',options:['become','became','becom','becume'],answer:0,explanation:'become = b-e-c-o-m-e' },
+  ],
+  grammar: [
+    { subtype:'fill_blank',difficulty:'easy',question:'It ____ an egg.',options:['was','were','is','are'],answer:0,explanation:'It 用单数过去式 was。' },
+    { subtype:'fill_blank',difficulty:'easy',question:'They ____ caterpillars.',options:['were','was','are','is'],answer:0,explanation:'They 是复数，过去式用 were。' },
+    { subtype:'fill_blank',difficulty:'easy',question:'Now it ____ a butterfly.',options:['is','was','were','are'],answer:0,explanation:'Now 是现在，用 is。' },
+    { subtype:'fill_blank',difficulty:'medium',question:'The caterpillar ____ small.',options:['was','were','are','is'],answer:0,explanation:'caterpillar 单数，过去式用 was。' },
+    { subtype:'fill_blank',difficulty:'medium',question:'The eggs ____ on the leaf.',options:['were','was','is','am'],answer:0,explanation:'eggs 复数，过去式用 were。' },
+    { subtype:'reorder',difficulty:'medium',question:'排成句子：',words:['egg','an','was','it'],answerOrder:[2,3,1,0],explanation:'It was an egg.' },
+    { subtype:'error_fix',difficulty:'hard',question:'哪处有错？"It were a caterpillar."',options:['It','were','a','caterpillar'],answer:1,explanation:'It 是单数，应该用 was。' },
+    { subtype:'fill_blank',difficulty:'medium',question:'The caterpillar ____ a cocoon.',options:['makes','make','made','making'],answer:0,explanation:'caterpillar 单数用 makes。' },
+    { subtype:'fill_blank',difficulty:'hard',question:'The butterfly ____ beautiful wings.',options:['has','have','had','is'],answer:0,explanation:'butterfly 单数用 has。' },
+    { subtype:'reorder',difficulty:'hard',question:'排成句子：',words:['beautiful','a','butterfly','what'],answerOrder:[3,2,1,0],explanation:'What a beautiful butterfly!' },
+    { subtype:'fill_blank',difficulty:'easy',question:'It ____ small. Now it ____ big.',options:['was / is','is / was','were / are','was / was'],answer:0,explanation:'空1过去 was，空2现在 is。' },
+    { subtype:'error_fix',difficulty:'hard',question:'哪处有错？"The caterpillar are eating leaves."',options:['The','caterpillar','are','leaves'],answer:2,explanation:'caterpillar 单数用 is eating。' },
+    { subtype:'fill_blank',difficulty:'medium',question:'The caterpillar ____ into a butterfly.',options:['turns','turn','turned','turning'],answer:0,explanation:'caterpillar 单数用 turns。' },
+    { subtype:'fill_blank',difficulty:'medium',question:'____ a beautiful butterfly!',options:['What','How','Where','When'],answer:0,explanation:'What a + 名词 + ! 感叹句。' },
+    { subtype:'fill_blank',difficulty:'easy',question:'A butterfly ____ eggs on a leaf.',options:['lays','lay','laid','laying'],answer:0,explanation:'butterfly 单数用 lays。' },
+    { subtype:'reorder',difficulty:'medium',question:'排成句子：',words:['caterpillar','the','leaves','eats'],answerOrder:[1,0,3,2],explanation:'The caterpillar eats leaves.' },
+    { subtype:'fill_blank',difficulty:'hard',question:'The caterpillar ____ bigger and bigger.',options:['grows','grow','grew','growing'],answer:0,explanation:'caterpillar 单数用 grows。' },
+    { subtype:'error_fix',difficulty:'medium',question:'哪处有错？"The butterfly are beautiful."',options:['The','butterfly','are','beautiful'],answer:2,explanation:'butterfly 单数用 is。' },
+    { subtype:'fill_blank',difficulty:'medium',question:'Look! The caterpillar ____ eating.',options:['is','was','were','are'],answer:0,explanation:'Look! 表现在进行，用 is eating。' },
+    { subtype:'fill_blank',difficulty:'hard',question:'The eggs ____ small. Now they ____ big.',options:['were / are','was / is','are / were','were / were'],answer:0,explanation:'eggs 复数：过去 were，现在 are。' },
+  ],
+  listening: [
+    { audioText:'It was an egg. Now it is a caterpillar. It eats leaves.',audioLines:[{speaker:'Narrator',text:'It was an egg. Now it is a caterpillar. It eats leaves.'}],question:'What was it before?',options:['An egg.','A caterpillar.','A cocoon.','A butterfly.'],answer:0,explanation:'"It was an egg."' },
+    { audioText:'The caterpillar makes a cocoon. It stays in the cocoon for two weeks.',audioLines:[{speaker:'Narrator',text:'The caterpillar makes a cocoon. It stays in the cocoon for two weeks.'}],question:'How long does it stay in the cocoon?',options:['Two weeks.','Two days.','Two months.','Two years.'],answer:0,explanation:'"for two weeks."' },
+    { audioText:'Look! The butterfly comes out of the cocoon. It has beautiful wings.',audioLines:[{speaker:'Child',text:'Look! The butterfly comes out of the cocoon.'},{speaker:'Child',text:'It has beautiful wings.'}],question:'What comes out of the cocoon?',options:['A butterfly.','A caterpillar.','An egg.','A pupa.'],answer:0,explanation:'"The butterfly comes out of the cocoon."' },
+    { audioText:'A butterfly lays an egg on a leaf. Then the egg hatches.',audioLines:[{speaker:'Narrator',text:'A butterfly lays an egg on a leaf.'},{speaker:'Narrator',text:'Then the egg hatches.'}],question:'Where does the butterfly lay the egg?',options:['On a leaf.','On a flower.','On the ground.','In the water.'],answer:0,explanation:'"on a leaf."' },
+    { audioText:'The caterpillar was small. Now it is big. It eats many leaves.',audioLines:[{speaker:'Narrator',text:'The caterpillar was small. Now it is big. It eats many leaves.'}],question:'What does the caterpillar eat?',options:['Leaves.','Cocoons.','Eggs.','Flowers.'],answer:0,explanation:'"It eats many leaves."' },
+    { audioText:'First it was an egg. Then it was a caterpillar. Then it was a cocoon. Now it is a butterfly!',audioLines:[{speaker:'Child',text:'First it was an egg. Then it was a caterpillar. Then it was a cocoon. Now it is a butterfly!'}],question:'What is the correct order?',options:['Egg-caterpillar-cocoon-butterfly.','Caterpillar-egg-cocoon-butterfly.','Egg-cocoon-caterpillar-butterfly.','Butterfly-egg-caterpillar-cocoon.'],answer:0,explanation:'Life cycle order as stated.' },
+    { audioText:'The eggs were on the leaf. They were very small. Now they are caterpillars.',audioLines:[{speaker:'Narrator',text:'The eggs were on the leaf.'},{speaker:'Narrator',text:'They were very small.'},{speaker:'Narrator',text:'Now they are caterpillars.'}],question:'Where were the eggs?',options:['On the leaf.','On the flower.','In the tree.','On the ground.'],answer:0,explanation:'"The eggs were on the leaf."' },
+    { audioText:'What a beautiful butterfly! It has big wings. It can fly.',audioLines:[{speaker:'Child',text:'What a beautiful butterfly! It has big wings. It can fly.'}],question:'What can the butterfly do?',options:['Fly.','Swim.','Run.','Jump.'],answer:0,explanation:'"It can fly."' },
+    { audioText:'The pupa is inside the cocoon. It is changing. Soon it will be a butterfly.',audioLines:[{speaker:'Teacher',text:'The pupa is inside the cocoon. It is changing. Soon it will be a butterfly.'}],question:'What is inside the cocoon?',options:['The pupa.','The egg.','The caterpillar.','The butterfly.'],answer:0,explanation:'"The pupa is inside the cocoon."' },
+  ],
+  boss: [
+    { question:'Which is the correct life cycle of a butterfly?',options:['Egg-caterpillar-cocoon-butterfly.','Egg-cocoon-caterpillar-butterfly.','Caterpillar-egg-cocoon-butterfly.','Butterfly-egg-caterpillar-cocoon.'],answer:0,explanation:'卵→毛毛虫→茧→蝴蝶。' },
+    { question:'It ____ an egg. Now it ____ a caterpillar.',options:['was / is','is / was','were / are','was / was'],answer:0,explanation:'过去用 was，现在用 is。' },
+    { question:'The caterpillar ____ a cocoon and stays inside.',options:['makes','make','made','making'],answer:0,explanation:'caterpillar 单数用 makes。' },
+    { question:'What does a caterpillar eat?',options:['Leaves.','Meat.','Flowers.','Fruit.'],answer:0,explanation:'Caterpillars eat leaves.' },
+    { question:'____ a beautiful butterfly!',options:['What','How','Where','When'],answer:0,explanation:'What a + adj + n! 感叹句。' },
+    { question:'The eggs ____ small. Now they ____ caterpillars.',options:['were / are','was / is','are / were','were / were'],answer:0,explanation:'eggs 复数：过去 were，现在 are。' },
+    { question:'The caterpillar ____ into a butterfly.',options:['turns','turn','turned','turning'],answer:0,explanation:'一般现在时，单数用 turns。' },
+  ]
+};
+
+// 从题库随机抽取
+function makeQuestions(day){
+  const bank = DAY2_BANK;
+  return [
+    ...pickQ(bank.vocab,17).map((q,i)=>({...q,id:`v${i+1}`,stage:'vocab'})),
+    ...pickQ(bank.grammar,13).map((q,i)=>({...q,id:`g${i+1}`,stage:'grammar'})),
+    ...pickQ(bank.listening,6).map((q,i)=>({...q,id:`l${i+1}`,stage:'listening'})),
+    ...pickQ(bank.boss,4).map((q,i)=>({...q,id:`b${i+1}`,stage:'boss',time_limit:30}))
+  ];
+}
+
+const CURRENT_DAY = 'day1';
+const QUESTIONS = makeQuestions(CURRENT_DAY);
+const DAY_TITLE = DAY2_BANK.title;
+const dayNum = 1;
+// ============================================================
+const game = {
+  state:'idle',stage:0,qIndex:0,score:0,streak:0,maxStreak:0,wrongQs:[],reviewMode:false,
+  results:{
+    vocab:{correct:0,total:0,score:0},
+    grammar:{correct:0,total:0,score:0},
+    listening:{correct:0,total:0,score:0},
+    boss:{correct:0,total:0,score:0},
+  },
+  timer:null,timerRemaining:0,timerTotal:0,answered:false
+};
+
+const STAGE_KEYS = ['vocab','grammar','listening','boss'];
+const STAGE_NAMES = ['词汇闯关','语法迷宫','听力挑战','Boss 关'];
+const STAGE_BADGES = ['📝','🔤','🎧','⚡'];
+const STAGE_DESCS = ['17 道词汇题','13 道语法题','6 道听力题 · 点播放听对话','4 道 Boss 题 · 限时 30 秒'];
+const STAGE_HINTS = ['Ready?','继续加油！','仔细听对话哦！','最后冲刺！'];
+
+const $ = id => document.getElementById(id);
+let currentStageQuestions = [];
+
+function getStageQs(stage) { return QUESTIONS.filter(q => q.stage === STAGE_KEYS[stage]); }
+
+// ============================================================
+//  Loading
+// ============================================================
+function doLoading(cb) {
+  let p=0; const msgs=['准备出发…','加载岛屿地图…','整理藏宝图…','检查英语装备…','一切就绪！'];
+  const iv=setInterval(()=>{p+=5;$('loading-bar').style.width=Math.min(p,100)+'%';
+    $('loading-text').textContent=msgs[Math.min(Math.floor(p/25),4)];
+    if(p>=100){clearInterval(iv);setTimeout(()=>{$('loading').classList.add('done');
+      setTimeout(()=>{$('loading').classList.add('hidden');$('start').classList.remove('hidden');},500);if(cb)cb();},300);}},40);
+}
+
+// ============================================================
+//  Start
+// ============================================================
+$('start-btn').addEventListener('click',()=>{
+  $('start').classList.add('hidden');
+  game.stage=0;game.qIndex=0;game.score=0;game.streak=0;game.maxStreak=0;
+  STAGE_KEYS.forEach(k=>{game.results[k]={correct:0,total:getStageQs(STAGE_KEYS.indexOf(k)).length,score:0};});
+  currentStageQuestions=getStageQs(0);
+  showStageTransition(0,()=>{$('game').classList.remove('hidden');showQuestion();});
+});
+
+// ============================================================
+//  Stage Transition
+// ============================================================
+function showStageTransition(stage,cb){
+  game.state='transition';
+  $('stg-icon').textContent=STAGE_BADGES[stage];
+  $('stg-name').textContent=STAGE_NAMES[stage];
+  $('stg-desc').textContent=STAGE_DESCS[stage];
+  $('stg-hint').textContent=STAGE_HINTS[stage];
+  $('stage-transition').classList.remove('hidden');
+  setTimeout(()=>{$('stage-transition').classList.add('hidden');if(cb)cb();},1800);
+}
+
+// ============================================================
+//  Show Question
+// ============================================================
+let reorderChips=[],reorderSlots=[];
+
+// Shuffle options: randomize order, track correct answer's new position
+function shuffleOptions(q){
+  if(!q.options||q.subtype==='reorder')return null;
+  const indices=q.options.map((_,i)=>i);
+  for(let i=indices.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [indices[i],indices[j]]=[indices[j],indices[i]];
+  }
+  const shuffledOpts=indices.map(i=>q.options[i]);
+  const newAnswer=indices.indexOf(q.answer);
+  return {options:shuffledOpts,answer:newAnswer};
+}
+
+function showQuestion(){
+  if(game.qIndex>=currentStageQuestions.length){endStage();return;}
+  const q=currentStageQuestions[game.qIndex];
+  game.answered=false;game.state='playing';
+
+  $('stage-badge').textContent=STAGE_BADGES[game.stage];
+  $('stage-name-bar').textContent=STAGE_NAMES[game.stage];
+  updateScoreBar();
+
+  const totalQ=game.reviewMode ? currentStageQuestions.length : QUESTIONS.length;
+  const doneQ=game.reviewMode ? game.qIndex : getDoneCount();
+  $('progress-fill').style.width=Math.min(Math.round(doneQ/totalQ*100),100)+'%';
+  $('progress-label').textContent=`${doneQ+1} / ${totalQ}`;
+
+  const typeMap={'vocab':['词汇题','vocab'],'grammar':['语法题','grammar'],'listening':['听力题','listening'],'boss':['Boss题','boss']};
+  const [tLabel,tClass]=typeMap[q.stage]||['题',''];
+  const tag=$('q-type-tag');tag.textContent=tLabel;tag.className='question-type-tag '+tClass;
+  $('q-diff').textContent='· ' + ({easy:'简单',medium:'中等',hard:'困难'}[q.difficulty]||q.difficulty);
+
+  // Clear dynamic content
+  const container=$('q-container');
+  container.innerHTML=`<div class="question-text" id="q-text">${q.question}</div>`;
+
+  const grid=$('options-grid');grid.innerHTML='';grid.style.display='';
+
+  // Listening type: show play button
+  if(q.stage==='listening'){
+    grid.style.display='none';
+    renderListeningUI(q);
+    return;
+  }
+
+  // Reorder type
+  if(q.subtype==='reorder'){
+    grid.style.display='none';
+    renderReorderUI(q);
+    return;
+  }
+
+  // Standard options with shuffling
+  const labels=['A','B','C','D'];
+  const shuffled=shuffleOptions(q);
+  const opts=shuffled||{options:q.options,answer:q.answer};
+  const curAnswer=opts.answer;
+  opts.options.forEach((opt,i)=>{
+    const btn=document.createElement('button');btn.className='option-btn';
+    btn.innerHTML=`<span class="opt-label">${labels[i]}</span>${opt}`;
+    btn.dataset.index=i;
+    function handleOpt(){handleAnswerWithCorrect(i,curAnswer,q);}
+    btn.addEventListener('click',handleOpt);
+    btn.addEventListener('touchend',function(e){e.preventDefault();handleOpt();});
+    grid.appendChild(btn);
+  });
+
+  startTimer(q);
+}
+
+function getDoneCount(){
+  let c=0;
+  if(game.stage===0)c=game.qIndex;
+  else if(game.stage===1)c=getStageQs(0).length+game.qIndex;
+  else if(game.stage===2)c=getStageQs(0).length+getStageQs(1).length+game.qIndex;
+  else c=getStageQs(0).length+getStageQs(1).length+getStageQs(2).length+game.qIndex;
+  return c;
+}
+
+// ============================================================
+//  Listening UI
+// ============================================================
+
+function renderListeningUI(q){
+  const container=$('q-container');
+  container.innerHTML=`
+    <div class="listening-box">
+      <div class="listening-hint"><span style="font-size:18px;">🎧</span> 仔细听对话，然后回答问题</div>
+      <button class="listening-play-btn pulse" id="listen-play-btn">
+        <span>🔊</span> <span id="listen-btn-text">点击播放音频</span>
+      </button>
+    </div>
+  `;
+
+  const btn=$('listen-play-btn');
+  let audioPlayed=false;
+
+  function playAudio(callback){
+    if('speechSynthesis'in window && window.speechSynthesis){
+      window.speechSynthesis.cancel();
+      const utterance=new SpeechSynthesisUtterance(q.audioText);
+      utterance.lang='en-US';utterance.rate=0.8;utterance.volume=1.0;
+      if(!window.__voicesLoaded){window.speechSynthesis.getVoices();window.__voicesLoaded=true;}
+      const voices=window.speechSynthesis.getVoices();
+      const enVoice=voices.find(v=>v.lang.startsWith('en'));
+      if(enVoice)utterance.voice=enVoice;
+      utterance.onstart=()=>{btn.classList.add('playing');btn.classList.remove('pulse');$('listen-btn-text').textContent='🔊 正在播放…';};
+      utterance.onend=()=>{
+        btn.classList.remove('playing');$('listen-btn-text').textContent='🔄 重听一次';
+        btn.classList.add('pulse');
+        if(callback)callback();
+      };
+      utterance.onerror=()=>{
+        btn.classList.remove('playing');$('listen-btn-text').textContent='🔄 重听一次';
+        btn.classList.add('pulse');
+        if(callback)callback();
+      };
+      window.speechSynthesis.speak(utterance);
+    } else {
+      $('listen-btn-text').textContent='🔄 重听 (语音不可用)';
+      if(callback)callback();
+    }
+  }
+
+  // Always require user tap to play audio (mobile-friendly: user gesture required)
+  btn.addEventListener('click',()=>{
+    if(!audioPlayed){
+      audioPlayed=true;
+      // Show question text AND options after audio finishes
+      playAudio(()=>{
+        // Insert question text into the listening box
+        const listenBox=$('q-container').querySelector('.listening-box');
+        if(listenBox){
+          const qText=document.createElement('div');
+          qText.style.cssText='font-size:16px;font-weight:600;color:var(--c-text);padding:12px;background:#F5F0FF;border-radius:10px;margin:8px 0;line-height:1.5;';
+          qText.textContent='📖 '+q.question;
+          listenBox.appendChild(qText);
+        }
+        showListeningOptions(q);
+      });
+    } else {
+      playAudio();
+    }
+  });
+
+  // No timer for listening
+  clearInterval(game.timer);
+  $('timer-text').textContent='∞';
+  $('timer-fill').style.width='100%';
+}
+
+function showListeningOptions(q){
+  const grid=$('options-grid');grid.innerHTML='';grid.style.display='';
+  const labels=['A','B','C','D'];
+  const shuffled=shuffleOptions(q);
+  const opts=shuffled||{options:q.options,answer:q.answer};
+  const curAnswer=opts.answer;
+  opts.options.forEach((opt,i)=>{
+    const btn=document.createElement('button');btn.className='option-btn';
+    btn.innerHTML=`<span class="opt-label">${labels[i]}</span>${opt}`;
+    btn.dataset.index=i;
+    function handleOpt(){handleAnswerWithCorrect(i,curAnswer,q);}
+    btn.addEventListener('click',handleOpt);
+    btn.addEventListener('touchend',function(e){e.preventDefault();handleOpt();});
+    grid.appendChild(btn);
+  });
+  // Start a generous timer for listening
+  game.timerTotal=q.time_limit||35;
+  game.timerRemaining=game.timerTotal;
+  startTimer(q);
+}
+
+// ============================================================
+//  Reorder UI
+// ============================================================
+function renderReorderUI(q){
+  const container=$('q-container');
+  container.innerHTML=`<div class="question-text">${q.question}</div>`;
+
+  const area=document.createElement('div');area.className='reorder-area';area.id='reorder-area';
+
+  // Shuffle chips
+  const shuffled=[...q.words].sort(()=>Math.random()-0.5);
+  reorderChips=shuffled.map(w=>({word:w,used:false}));
+  reorderSlots=[];
+
+  const chipsWrap=document.createElement('div');
+  chipsWrap.style.cssText='width:100%;display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;';
+  reorderChips.forEach((slot,i)=>{
+    const chip=document.createElement('span');chip.className='reorder-chip';chip.textContent=slot.word;
+    chip.dataset.idx=i;
+    chip.addEventListener('click',()=>{
+      if(game.answered)return;
+      chip.classList.add('used');reorderChips[i].used=true;
+      const span=document.createElement('span');span.className='reorder-slot-word';span.textContent=slot.word;
+      span.addEventListener('click',()=>{
+        if(game.answered)return;
+        const ci=reorderChips.findIndex(s=>s.word===slot.word&&s.used);
+        if(ci>=0){reorderChips[ci].used=false;}
+        document.querySelectorAll('.reorder-chip').forEach(c=>{if(c.textContent===slot.word&&c.classList.contains('used'))c.classList.remove('used');});
+        span.remove();
+      });
+      $('reorder-result').appendChild(span);
+    });
+    chipsWrap.appendChild(chip);
+  });
+  area.appendChild(chipsWrap);
+
+  const resultWrap=document.createElement('div');resultWrap.id='reorder-result';
+  resultWrap.style.cssText='width:100%;display:flex;flex-wrap:wrap;gap:6px;min-height:40px;padding:8px;background:#F5F0FF;border-radius:10px;';
+  area.appendChild(resultWrap);
+
+  const checkBtn=document.createElement('button');checkBtn.className='reorder-check-btn';checkBtn.textContent='✅ 确认排序';
+  checkBtn.addEventListener('click',()=>{
+    if(game.answered)return;
+    const words=[];$('reorder-result').querySelectorAll('.reorder-slot-word').forEach(s=>words.push(s.textContent));
+    const correctOrder=q.answerOrder.map(i=>q.words[i]);
+    const isCorrect=words.length===correctOrder.length&&words.every((w,i)=>w===correctOrder[i]);
+    game.answered=true;clearInterval(game.timer);
+    if(isCorrect){onCorrectAnswer(q);}else{onWrongAnswer(q);}
+  });
+  area.appendChild(checkBtn);
+
+  // Show correct answer order indicator
+  const helpText=document.createElement('div');
+  helpText.style.cssText='width:100%;font-size:12px;color:var(--c-text-secondary);margin-top:4px;';
+  helpText.textContent='💡 点击单词 → 按顺序排列 → 点击确认';
+  area.appendChild(helpText);
+
+  container.appendChild(area);
+  startTimer(q);
+}
+
+// ============================================================
+//  Timer
+// ============================================================
+function startTimer(q){
+  clearInterval(game.timer);
+  const fill=$('timer-fill'),text=$('timer-text');
+  const total=q.time_limit||30;
+  game.timerTotal=total;
+  fill.style.width='100%';fill.classList.remove('warning');
+  text.textContent=total;text.style.color='';
+  const start=Date.now();
+  game.timer=setInterval(()=>{
+    const elapsed=(Date.now()-start)/1000;
+    const remain=Math.max(0,total-elapsed);
+    game.timerRemaining=remain;
+    fill.style.width=(remain/total*100)+'%';
+    text.textContent=Math.ceil(remain);
+    if(remain<=5&&remain>0){fill.classList.add('warning');text.style.color='var(--c-error)';}
+    if(remain<=0){clearInterval(game.timer);if(!game.answered)handleTimeout(q);}
+  },100);
+}
+
+function handleTimeout(q){
+  game.answered=true;game.streak=0;updateScoreBar();
+  showFeedback(false,q,0,'');
+}
+
+// ============================================================
+//  Handle Answer
+// ============================================================
+function handleAnswer(idx,q){
+  if(game.answered)return;
+  game.answered=true;clearInterval(game.timer);
+  const isCorrect=idx===q.answer;
+  const btns=document.querySelectorAll('.option-btn');
+  btns.forEach((btn,i)=>{
+    btn.classList.add('disabled');
+    if(i===q.answer)btn.classList.add('correct');
+    if(i===idx&&!isCorrect)btn.classList.add('wrong');
+  });
+  if(isCorrect)onCorrectAnswer(q);else onWrongAnswer(q);
+}
+
+// New: handle shuffled answers — pass dynamic correctIdx
+function handleAnswerWithCorrect(idx,correctIdx,q){
+  if(game.answered)return;
+  game.answered=true;clearInterval(game.timer);
+  const isCorrect=idx===correctIdx;
+  const btns=document.querySelectorAll('.option-btn');
+  btns.forEach((btn,i)=>{
+    btn.classList.add('disabled');
+    if(i===correctIdx)btn.classList.add('correct');
+    if(i===idx&&!isCorrect)btn.classList.add('wrong');
+  });
+  if(isCorrect)onCorrectAnswer(q);else onWrongAnswer(q);
+}
+
+function onCorrectAnswer(q){
+  game.streak++;if(game.streak>game.maxStreak)game.maxStreak=game.streak;
+  const base=100,diffM={easy:1.0,medium:1.5,hard:2.0}[q.difficulty]||1.0;
+  const remain=game.timerRemaining||game.timerTotal||30;
+  const total=game.timerTotal||30;
+  const speedRatio=remain/total;
+  const speedM=1.0+Math.min(0.3,speedRatio*0.3);
+  const streakM=1.0+Math.min(0.5,(game.streak-1)*0.05);
+  const score=Math.round(base*diffM*speedM*streakM);
+  game.score+=score;
+  const sk=STAGE_KEYS[game.stage];
+  game.results[sk].correct++;game.results[sk].score+=score;
+  if(game.reviewMode && q.wrongIdx!==undefined){
+    game.wrongQs.splice(q.wrongIdx,1);
+    game.wrongQs.forEach((wq,i)=>wq.wrongIdx=i);
+  }
+  updateScoreBar();
+  showFeedback(true,q,score,'');
+}
+
+function onWrongAnswer(q){
+  game.streak=0;updateScoreBar();
+  if(!game.reviewMode){
+    const exists=game.wrongQs.some(wq=>wq.id===q.id);
+    if(!exists) game.wrongQs.push({...q,wrongIdx:game.wrongQs.length});
+  }
+  showFeedback(false,q,0,'');
+}
+
+// ============================================================
+//  Feedback — FIXED: longer delays for wrong answers
+// ============================================================
+function showFeedback(isCorrect,q,score,title){
+  const overlay=$('feedback-overlay');
+  $('fb-icon').textContent=isCorrect?'✅':'❌';
+  $('fb-score').textContent=isCorrect?`+${score}`:'+0';
+  $('fb-score').style.color=isCorrect?'var(--c-accent)':'var(--c-error)';
+  $('fb-detail').textContent=title;
+
+  // Audio transcript for listening questions
+  const audioEl=$('fb-audio-text');
+  if(q.stage==='listening' && q.audioText){
+    audioEl.innerHTML='🔊 听到的对话：<br><em style="color:var(--c-primary);">"'+q.audioText+'"</em>';
+    audioEl.classList.remove('hidden');
+  } else {
+    audioEl.classList.add('hidden');
+  }
+
+  // Question text for listening
+  const qTextEl=$('fb-question-text');
+  if(q.stage==='listening' && q.question){
+    qTextEl.textContent='📖 题目：' + q.question;
+    qTextEl.classList.remove('hidden');
+  } else {
+    qTextEl.classList.add('hidden');
+  }
+
+  // Always show correct answer (educational)
+  const answerEl=$('fb-answer');
+  if(q.options){
+    const correctText=q.options[q.answer];
+    answerEl.textContent=`✓ 正确答案: ${correctText}`;
+    answerEl.classList.remove('hidden');
+  } else {
+    answerEl.classList.add('hidden');
+  }
+
+  if(q.explanation){
+    $('fb-explain').textContent='💡 '+q.explanation;
+    $('fb-explain').classList.remove('hidden');
+  } else {
+    $('fb-explain').classList.add('hidden');
+  }
+
+  overlay.classList.add('show');
+  // Show "Next" button — manual advance
+  const nextBtn=$('fb-next-btn');
+  nextBtn.classList.remove('hidden');
+  nextBtn.onclick=()=>{
+    overlay.classList.remove('show');
+    nextBtn.classList.add('hidden');
+    nextQuestion();
+  };
+  nextBtn.ontouchend=(e)=>{e.preventDefault();nextBtn.onclick();};
+
+  // "再做一遍" — redo the current question
+  const redoBtn=$('fb-redo-btn');
+  if(q.stage==='listening'){
+    // Listening questions can't be redone (audio already played)
+    redoBtn.style.display='none';
+  } else {
+    redoBtn.style.display='';
+    redoBtn.onclick=()=>{
+      overlay.classList.remove('show');
+      nextBtn.classList.add('hidden');
+      game.answered=false;
+      // Reset streak penalty for this question
+      // Re-show the question with reshuffled options
+      showQuestion();
+    };
+    redoBtn.ontouchend=(e)=>{e.preventDefault();redoBtn.onclick();};
+  }
+}
+
+function updateScoreBar(){
+  $('top-score').innerHTML=`⭐ ${game.score}`;
+  $('top-streak').innerHTML=game.streak>0?`🔥 ${game.streak}`:'🔥 0';
+}
+
+// ============================================================
+//  Navigate
+// ============================================================
+function nextQuestion(){game.qIndex++;showQuestion();}
+
+function endStage(){
+  if(game.reviewMode){
+    $('game').classList.add('hidden');
+    showResults();
+    return;
+  }
+  const isBoss=game.stage===3;
+  if(isBoss){$('game').classList.add('hidden');showResults();return;}
+  game.stage++;game.qIndex=0;
+  // 🐛 FIX: update currentStageQuestions for the new stage
+  currentStageQuestions=getStageQs(game.stage);
+  gameScreen.classList.add('hidden');
+  showStageTransition(game.stage,()=>{gameScreen.classList.remove('hidden');showQuestion();});
+}
+
+// ============================================================
+//  Results
+// ============================================================
+function showResults(){
+  game.state='results';$('game').classList.add('hidden');$('results').classList.remove('hidden');
+  const total=QUESTIONS.length;
+  const correct=STAGE_KEYS.reduce((s,k)=>s+game.results[k].correct,0);
+  const acc=total>0?Math.round(correct/total*100):0;
+
+  let emoji='🏆',title='闯关完成！';
+  if(acc>=90){emoji='🌟';title='太厉害了！';}else if(acc>=70){emoji='🎉';title='表现不错！';}else if(acc>=50){emoji='💪';title='继续加油！';}else{emoji='🤔';title='下次会更好！';}
+  $('result-emoji').textContent=emoji;$('result-title').textContent=title;
+  $('result-total-score').textContent=game.score;
+  $('result-accuracy').textContent=acc+'%';$('result-streak').textContent=game.maxStreak;
+
+  ['vocab','grammar','listening','boss'].forEach(k=>{
+    const r=game.results[k];
+    $(`r-${k}`).textContent=`${r.correct}/${r.total}`;
+    $(`r-${k}-pct`).textContent=r.total>0?`(${Math.round(r.correct/r.total*100)}%)`:'';
+  });
+  $('r-total-detail').textContent=game.score+' 分';
+  $('r-total-pct').textContent=`(${correct}/${total} 正确)`;
+}
+
+// ============================================================
+//  Buttons
+// ============================================================
+$('restart-btn').addEventListener('click',()=>{
+  $('results').classList.add('hidden');$('game').classList.add('hidden');
+  game.stage=0;game.qIndex=0;game.score=0;game.streak=0;game.maxStreak=0;
+  $('start').classList.remove('hidden');
+});
+
+$('next-btn').addEventListener('click',()=>{
+  alert('🏝️ Day 3 预告\n\nWatch it grow! — 生命周期词汇\n‣ 单词: caterpillar, butterfly, egg, cocoon\n‣ 句型: It was an egg. Now it\'s a caterpillar.\n‣ 继续解锁语言宝藏！');
+});
+
+// ============================================================
+//  Init
+// ============================================================
+const gameScreen=$('game');
+document.addEventListener('DOMContentLoaded',()=>{
+  // 初始化界面（DOM 加载完成后才能操作）
+  $('day-tag-text').textContent = `Day ${dayNum} · 5B 下册`;
+  const titleParts = DAY_TITLE.split('·');
+  $('start-title').textContent = titleParts[0].trim();
+  $('start-sub').textContent = titleParts[1] || '';
+  $('result-sub').textContent = `Day ${dayNum} · ${titleParts[0].trim()}`;
+  const storyBox = $('start').querySelector('.story-box');
+  if(storyBox){
+    storyBox.innerHTML = `📖 第 ${dayNum} 天挑战！今天的主题是：<em>${DAY_TITLE}</em><br><br>🎯 5B 下册 · 加油！`;
+  }
+
+  doLoading();
+});
+</script>
+</body>
+</html>
