@@ -1,0 +1,10 @@
+node_modules/
+.workbuddy/
+.codebuddy/
+.git/
+.DS_Store
+compressed_*.jpg
+微信图片_*.jpg
+*.docx
+__pycache__/
+*.pyc
