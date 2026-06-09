@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>数学大冒险 · Day 6 — 数据与分析</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --c-bg: #FFF4E6; --c-surface: #FFFFFF;
+    --c-primary: #E67E22; --c-primary-light: #F0B27A; --c-primary-dark: #D35400;
+    --c-accent: #2980B9; --c-accent-light: #5DADE2;
+    --c-success: #27AE60; --c-success-bg: #E8F8F0;
+    --c-error: #E74C3C; --c-error-bg: #FDEDEC;
+    --c-text: #1A237E; --c-text-secondary: #5D6D7E;
+    --c-gold: #F39C12;
+    --radius-sm: 10px; --radius-md: 16px; --radius-lg: 24px;
+    --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  }
+  html, body { height: 100%; overflow: hidden; }
+  body { font-family: var(--font); background: var(--c-bg); color: var(--c-text); display: flex; justify-content: center; align-items: center; -webkit-font-smoothing: antialiased; }
+  .app { width: 100%; height: 100%; max-width: 480px; max-height: 860px; background: var(--c-surface); position: relative; overflow: hidden; box-shadow: 0 0 60px rgba(230,126,34,0.1); display: flex; flex-direction: column; }
+  .hidden { display: none !important; }
+  .flex-center { display: flex; align-items: center; justify-content: center; }
+  #loading { position: absolute; inset: 0; z-index: 100; background: linear-gradient(135deg, #E67E22, #D35400); flex-direction: column; gap: 24px; transition: opacity 0.5s, transform 0.5s; }
+  #loading.done { opacity: 0; transform: scale(1.05); pointer-events: none; }
+  .loading-icon { width: 80px; height: 80px; border-radius: 50%; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; font-size: 40px; animation: pulse-glow 1.5s ease-in-out infinite; }
+  @keyframes pulse-glow { 0%,100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.3); } 50% { box-shadow: 0 0 30px 10px rgba(255,255,255,0.1); } }
+  .loading-title { color: #fff; font-size: 22px; font-weight: 700; letter-spacing: 2px; }
+  .loading-bar-wrap { width: 220px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 4px; overflow: hidden; }
+  .loading-bar { height: 100%; width: 0; background: #fff; border-radius: 4px; transition: width 0.3s; }
+  #start { position: absolute; inset: 0; z-index: 90; background: linear-gradient(180deg, #FDEBD0, #FFF4E6 40%, #E8F8F5); flex-direction: column; padding: 40px 24px 32px; text-align: center; }
+  .island-visual { position: relative; width: 200px; height: 160px; margin: 10px auto 0; }
+  .island-cloud { position: absolute; background: #fff; border-radius: 50%; opacity: 0.7; }
+  .island-cloud:nth-child(1) { width: 60px; height: 24px; top: 10px; left: 20px; }
+  .island-cloud:nth-child(2) { width: 80px; height: 28px; top: 30px; right: 10px; }
+  .island-cloud:nth-child(3) { width: 50px; height: 20px; top: 0; right: 50px; }
+  .island-base { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 180px; height: 100px; background: linear-gradient(180deg, #85C1E9, #5DADE2); border-radius: 50% 50% 40% 40%; }
+  .island-tree { position: absolute; bottom: 70px; left: 50%; transform: translateX(-50%); width: 70px; height: 70px; background: radial-gradient(circle at 50% 60%, #F0B27A 30%, #E67E22 70%); border-radius: 50%; }
+  .island-tree::after { content: ''; position: absolute; bottom: -30px; left: 50%; transform: translateX(-50%); width: 12px; height: 30px; background: #8B6B4A; border-radius: 4px; }
+  .island-flag { position: absolute; top: 5px; left: 50%; transform: translateX(-50%); font-size: 28px; }
+  .island-number { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--c-accent); color: #fff; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 800; box-shadow: 0 4px 12px rgba(41,128,185,0.4); z-index: 2; }
+  .day-tag { display: inline-block; background: linear-gradient(135deg, var(--c-primary), var(--c-primary-dark)); color: #fff; padding: 6px 20px; border-radius: 20px; font-size: 14px; font-weight: 600; margin-top: 16px; }
+  .start-title { font-size: 28px; font-weight: 800; margin-top: 12px; background: linear-gradient(135deg, var(--c-primary-dark), var(--c-accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .start-sub { font-size: 15px; color: var(--c-text-secondary); margin-top: 8px; line-height: 1.5; }
+  .start-info { display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap; justify-content: center; }
+  .start-info-item { background: var(--c-bg); padding: 10px 16px; border-radius: var(--radius-sm); font-size: 13px; color: var(--c-text-secondary); display: flex; align-items: center; gap: 6px; }
+  .start-info-item strong { color: var(--c-text); font-weight: 700; }
+  .story-box { margin-top: 16px; padding: 16px; background: #EAF2F8; border-radius: var(--radius-md); border-left: 4px solid var(--c-accent); text-align: left; font-size: 14px; line-height: 1.6; color: #1A237E; }
+  .story-box em { font-style: normal; color: var(--c-primary-dark); font-weight: 600; }
+  .btn-primary { margin-top: auto; width: 100%; padding: 16px; background: linear-gradient(135deg, var(--c-primary), var(--c-primary-dark)); color: #fff; border: none; border-radius: var(--radius-md); font-size: 18px; font-weight: 700; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; box-shadow: 0 6px 20px rgba(230,126,34,0.3); letter-spacing: 2px; }
+  .btn-primary:active { transform: scale(0.97); }
+  #game { position: absolute; inset: 0; z-index: 80; background: var(--c-surface); flex-direction: column; }
+  .topbar { display: flex; align-items: center; padding: 12px 16px 8px; background: var(--c-surface); z-index: 10; }
+  .topbar-stage { font-size: 13px; font-weight: 600; color: var(--c-primary); flex-shrink: 0; display: flex; align-items: center; gap: 6px; }
+  .topbar-score { margin-left: auto; font-size: 14px; font-weight: 700; color: var(--c-accent); display: flex; align-items: center; gap: 4px; }
+  .topbar-streak { font-size: 13px; font-weight: 700; color: var(--c-gold); margin-left: 12px; display: flex; align-items: center; gap: 3px; }
+  .progress-wrap { padding: 0 16px 4px; }
+  .progress-track { height: 6px; background: #FDEBD0; border-radius: 6px; overflow: hidden; position: relative; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--c-primary-light), var(--c-primary)); border-radius: 6px; transition: width 0.4s ease; }
+  .progress-label { font-size: 11px; color: var(--c-text-secondary); margin-top: 4px; text-align: right; }
+  .timer-wrap { padding: 8px 16px 0; display: flex; align-items: center; gap: 8px; }
+  .timer-bar-track { flex: 1; height: 4px; background: #FDEBD0; border-radius: 4px; overflow: hidden; }
+  .timer-bar-fill { height: 100%; background: var(--c-accent); border-radius: 4px; transition: width 1s linear, background-color 0.3s; }
+  .timer-bar-fill.warning { background: var(--c-error); }
+  .timer-text { font-size: 13px; font-weight: 700; color: var(--c-text); min-width: 32px; text-align: right; font-variant-numeric: tabular-nums; }
+  .question-area { flex: 1; padding: 0 20px 16px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; }
+  .question-type-tag { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: 600; width: fit-content; }
+  .question-type-tag.calc { background: #FDEBD0; color: #D35400; }
+  .question-type-tag.concept { background: #EAF2F8; color: #1A5276; }
+  .question-type-tag.apply { background: #E8F8F0; color: #1E8449; }
+  .question-type-tag.boss { background: #FDEDEC; color: #C0392B; }
+  .question-diff { font-size: 11px; color: var(--c-text-secondary); font-weight: 500; }
+  .question-text { font-size: 18px; font-weight: 600; line-height: 1.5; color: var(--c-text); }
+  .options-grid { display: grid; gap: 8px; }
+  .option-btn { width: 100%; padding: 14px 18px; border: 2px solid #FDEBD0; border-radius: var(--radius-sm); background: var(--c-surface); font-size: 17px; font-weight: 600; color: var(--c-text); cursor: pointer; text-align: left; transition: all 0.12s; display: flex; align-items: center; gap: 12px; }
+  .option-btn .opt-label { width: 28px; height: 28px; border-radius: 50%; background: var(--c-bg); color: var(--c-text-secondary); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; transition: all 0.12s; }
+  .option-btn:active { transform: scale(0.98); }
+  .option-btn.correct { border-color: var(--c-success) !important; background: var(--c-success-bg) !important; }
+  .option-btn.correct .opt-label { background: var(--c-success); color: #fff; }
+  .option-btn.wrong { border-color: var(--c-error) !important; background: var(--c-error-bg) !important; }
+  .option-btn.wrong .opt-label { background: var(--c-error); color: #fff; }
+  .option-btn.disabled { pointer-events: none; }
+  .feedback-overlay { position: absolute; inset: 0; z-index: 40; display: none; align-items: center; justify-content: center; pointer-events: none; }
+  .feedback-overlay.show { display: flex; }
+  .feedback-overlay.show .feedback-card { animation: bounceIn 0.4s ease both; }
+  .feedback-card { background: #fff; border-radius: var(--radius-lg); padding: 32px 28px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.15); max-width: 300px; }
+  .feedback-icon { font-size: 48px; margin-bottom: 8px; }
+  .feedback-score { font-size: 28px; font-weight: 800; color: var(--c-accent); }
+  .feedback-detail { font-size: 14px; color: var(--c-text-secondary); margin-top: 4px; }
+  .feedback-explain { margin-top: 12px; padding: 14px; background: #EAF2F8; border-radius: var(--radius-sm); font-size: 14px; line-height: 1.7; color: #1A237E; text-align: left; font-weight: 600; border-left: 4px solid #2980B9; }
+  .feedback-answer { display: inline-block; margin-top: 8px; padding: 6px 16px; background: #E8F8F0; border-radius: 20px; font-size: 16px; font-weight: 700; color: var(--c-success); }
+  .fb-next-btn { margin-top: 16px; width: 100%; padding: 12px; background: linear-gradient(135deg, var(--c-primary), var(--c-primary-dark)); color: #fff; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; pointer-events: auto; letter-spacing: 1px; }
+  .fb-next-btn:active { transform: scale(0.97); }
+  #stage-transition { position: absolute; inset: 0; z-index: 85; background: linear-gradient(135deg, var(--c-primary), var(--c-primary-dark)); flex-direction: column; gap: 12px; text-align: center; transition: opacity 0.4s; }
+  .stage-icon { font-size: 56px; }
+  .stage-name { font-size: 22px; font-weight: 700; color: #fff; }
+  .stage-desc { font-size: 14px; color: rgba(255,255,255,0.8); }
+  #results { position: absolute; inset: 0; z-index: 95; background: linear-gradient(180deg, #FDEBD0, #E8F8F5); flex-direction: column; padding: 32px 24px 24px; overflow-y: auto; }
+  .result-header { text-align: center; }
+  .result-emoji { font-size: 64px; margin-bottom: 4px; }
+  .result-title { font-size: 26px; font-weight: 800; color: var(--c-text); }
+  .result-sub { font-size: 15px; color: var(--c-text-secondary); margin-top: 4px; }
+  .result-score-card { background: #fff; border-radius: var(--radius-lg); padding: 24px; margin-top: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+  .score-big { font-size: 52px; font-weight: 800; color: var(--c-primary); text-align: center; line-height: 1; }
+  .score-label { font-size: 13px; color: var(--c-text-secondary); text-align: center; margin-top: 4px; }
+  .result-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+  .stat-item { text-align: center; padding: 12px; background: var(--c-bg); border-radius: var(--radius-sm); }
+  .stat-number { font-size: 22px; font-weight: 800; color: var(--c-text); }
+  .stat-label { font-size: 12px; color: var(--c-text-secondary); margin-top: 2px; }
+  .result-breakdown { margin-top: 16px; }
+  .result-breakdown-title { font-size: 14px; font-weight: 700; color: var(--c-text); margin-bottom: 8px; }
+  .breakdown-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: #fff; border-radius: var(--radius-sm); margin-bottom: 6px; font-size: 14px; }
+  .breakdown-row .b-label { color: var(--c-text-secondary); }
+  .breakdown-row .b-score { font-weight: 700; }
+  .breakdown-row .b-score.correct { color: var(--c-success); }
+  .breakdown-row .b-score.total { color: var(--c-primary); }
+  .breakdown-row .b-pct { font-size: 12px; color: var(--c-text-secondary); }
+  .result-rank { margin-top: 16px; padding: 14px; border-radius: var(--radius-md); background: linear-gradient(135deg, #EAF2F8, #FDEBD0); text-align: center; font-size: 14px; color: #1A237E; }
+  .result-actions { margin-top: auto; display: flex; gap: 12px; padding-top: 16px; }
+  .btn-secondary { flex: 1; padding: 14px; border: 2px solid var(--c-primary); border-radius: var(--radius-md); background: transparent; color: var(--c-primary); font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.15s; }
+  .btn-secondary:active { background: var(--c-bg); }
+  .btn-primary-small { flex: 2; padding: 14px; border: none; border-radius: var(--radius-md); background: linear-gradient(135deg, var(--c-primary), var(--c-primary-dark)); color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; letter-spacing: 2px; }
+  @keyframes fadeInUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+  @keyframes bounceIn { 0%{transform:scale(0.3);opacity:0;} 50%{transform:scale(1.05);} 70%{transform:scale(0.95);} 100%{transform:scale(1);opacity:1;} }
+  .anim-bounce { animation: bounceIn 0.5s ease both; }
+  .question-area::-webkit-scrollbar, #results::-webkit-scrollbar { width: 4px; }
+  .question-area::-webkit-scrollbar-thumb, #results::-webkit-scrollbar-thumb { background: #D0C8E0; border-radius: 4px; }
+  .answer-list-overlay { position:absolute;inset:0;z-index:110;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;padding:16px; }
+  .answer-list-overlay.show { display:flex; }
+  .answer-list-card { background:#fff;border-radius:var(--radius-lg);padding:24px 20px;max-width:440px;width:100%;max-height:85%;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+  .answer-list-card h3 { font-size:18px;font-weight:800;color:var(--c-text);margin-bottom:12px;text-align:center; }
+  .answer-list-card .al-section { margin-bottom:14px; }
+  .answer-list-card .al-section-title { font-size:14px;font-weight:700;color:var(--c-primary-dark);margin-bottom:6px;padding:6px 10px;background:#FFF4E6;border-radius:8px; }
+  .answer-list-card .al-item { padding:8px 10px;border-bottom:1px solid #F0E8E0;font-size:13px;line-height:1.5; }
+  .answer-list-card .al-item:last-child { border-bottom:none; }
+  .answer-list-card .al-q { color:var(--c-text);font-weight:600; }
+  .answer-list-card .al-a { color:var(--c-success);font-weight:700;margin-top:2px; }
+  .answer-list-card .al-close { width:100%;padding:12px;margin-top:10px;border:none;border-radius:var(--radius-md);background:var(--c-bg);color:var(--c-text-secondary);font-size:15px;font-weight:600;cursor:pointer; }
+  @media (max-width:480px) {
+    .start-title { font-size: 24px; }
+    .question-text { font-size: 18px; }
+    .option-btn { font-size: 15px; padding: 12px 14px; }
+    .score-big { font-size: 42px; }
+  }
+</style>
+</head>
+<body>
+<div class="app" id="app">
+<div id="loading" class="flex-center">
+  <div class="loading-icon">🔢</div>
+  <div class="loading-title">数学大冒险</div>
+  <div class="loading-bar-wrap"><div class="loading-bar" id="loading-bar"></div></div>
+  <div style="color:rgba(255,255,255,0.6);font-size:13px;" id="loading-text">准备出发…</div>
+</div>
+<div id="start" class="flex-center hidden">
+  <div class="day-tag">📅 <span id="day-tag-text">Day 6 · 五下</span></div>
+  <div class="island-visual">
+    <div class="island-cloud"></div><div class="island-cloud"></div><div class="island-cloud"></div>
+    <div class="island-base"></div><div class="island-tree"></div>
+    <div class="island-flag">🏴‍☠️</div><div class="island-number">6</div>
+  </div>
+  <div class="start-title" id="start-title">数据与分析</div>
+  <div class="start-sub" id="start-sub">北师大版五下 · 统计图表与平均数</div>
+  <div class="start-info">
+    <span class="start-info-item">⏱ <strong>30</strong> 分钟</span>
+    <span class="start-info-item">📝 <strong>40</strong> 题</span>
+    <span class="start-info-item">🏆 <strong>4</strong> 关</span>
+  </div>
+  <div class="story-box">
+    📖 今天我们来挑战<em>数据与分析</em>的数据分析！用统计图展示数据，用平均数分析整体水平。<br><br>
+    🧮 <strong>4 关闯关！</strong>口算 + 概念 + 应用 + Boss。
+  </div>
+  <button class="btn-primary" id="start-btn">🚀 开始挑战</button>
+</div>
+<div id="stage-transition" class="flex-center hidden">
+  <div class="stage-icon" id="stg-icon">📝</div>
+  <div class="stage-name" id="stg-name">口算速递</div>
+  <div class="stage-desc" id="stg-desc">17 道题</div>
+  <div style="margin-top:12px;color:rgba(255,255,255,0.5);font-size:13px;animation:fadeIn 0.8s 0.5s both;" id="stg-hint">准备好了吗？</div>
+</div>
+<div id="game" class="flex-center hidden">
+  <div class="topbar">
+    <div class="topbar-stage"><span id="stage-badge">📝</span> <span id="stage-name-bar">口算</span></div>
+    <div class="topbar-score" id="top-score">⭐ 0</div>
+    <div class="topbar-streak" id="top-streak">🔥 0</div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+    <div class="progress-label" id="progress-label">1 / 40</div>
+  </div>
+  <div class="timer-wrap">
+    <span style="font-size:13px;color:var(--c-text-secondary)">⏱</span>
+    <div class="timer-bar-track"><div class="timer-bar-fill" id="timer-fill" style="width:100%"></div></div>
+    <div class="timer-text" id="timer-text">30</div>
+  </div>
+  <div class="question-area" id="question-area">
+    <div><span class="question-type-tag" id="q-type-tag">计算题</span><span class="question-diff" id="q-diff">· 简单</span></div>
+    <div id="q-container"><div class="question-text" id="q-text">Loading…</div></div>
+    <div class="options-grid" id="options-grid"></div>
+  </div>
+  <div class="feedback-overlay" id="feedback-overlay">
+      <div class="feedback-card">
+        <div class="feedback-icon" id="fb-icon">✅</div>
+        <div class="feedback-score" id="fb-score">+100</div>
+        <div class="feedback-detail" id="fb-detail"></div>
+        <div class="feedback-explain hidden" id="fb-explain"></div>
+        <div class="feedback-answer hidden" id="fb-answer"></div>
+        <button class="fb-next-btn hidden" id="fb-next-btn" style="margin-top:12px;">下一题 →</button>
+      </div>
+  </div>
+</div>
+<div id="results" class="flex-center hidden">
+  <div class="result-header">
+    <div class="result-emoji" id="result-emoji">🏆</div>
+    <div class="result-title" id="result-title">闯关完成！</div>
+    <div class="result-sub" id="result-sub">Day 6 · 数据与分析</div>
+  </div>
+  <div class="result-score-card">
+    <div class="score-big" id="result-total-score">0</div>
+    <div class="score-label">总得分</div>
+    <div class="result-stats">
+      <div class="stat-item"><div class="stat-number" id="result-accuracy">0%</div><div class="stat-label">准确率</div></div>
+      <div class="stat-item"><div class="stat-number" id="result-streak">0</div><div class="stat-label">最高连击</div></div>
+    </div>
+  </div>
+  <div class="result-breakdown">
+    <div class="result-breakdown-title">📊 关卡详情</div>
+    <div class="breakdown-row"><span class="b-label">📝 口算速递</span><span class="b-score correct" id="r-calc">0/0</span><span class="b-pct" id="r-calc-pct"></span></div>
+    <div class="breakdown-row"><span class="b-label">🧠 概念通关</span><span class="b-score correct" id="r-concept">0/0</span><span class="b-pct" id="r-concept-pct"></span></div>
+    <div class="breakdown-row"><span class="b-label">🎯 应用挑战</span><span class="b-score total" id="r-apply">5 题需批改</span><span class="b-pct" id="r-apply-pct"></span></div>
+    <div class="breakdown-row"><span class="b-label">⚡ Boss 关</span><span class="b-score total" id="r-boss">5 题需批改</span><span class="b-pct" id="r-boss-pct"></span></div>
+    <div class="breakdown-row" style="background:var(--c-bg)"><span class="b-label" style="font-weight:700;">🏆 总计</span><span class="b-score total" id="r-total-detail">0 分</span><span class="b-pct" id="r-total-pct"></span></div>
+  </div>
+  <button class="btn-secondary" id="answer-list-btn" style="width:100%;margin-top:8px;padding:12px;border:2px solid var(--c-primary);border-radius:var(--radius-md);background:transparent;color:var(--c-primary);font-size:15px;font-weight:700;cursor:pointer;">📋 查看题目清单（含答案）</button>
+  <div class="result-rank">💡 做错的题会自动进入错题本，全部答对才算过关！</div>
+  <div class="result-redo hidden" id="result-redo-area" style="margin-top:12px;padding:14px;border-radius:var(--radius-md);background:#EAF2F8;text-align:center;">
+    <div style="font-size:14px;font-weight:600;color:#1A237E;margin-bottom:8px;">📝 有 <span id="wrong-count">0</span> 道题答错了</div>
+    <button class="btn-primary-small" id="redo-btn" style="padding:12px 24px;font-size:15px;">🔄 重做错题</button>
+  </div>
+  <div class="result-actions">
+    <button class="btn-secondary" id="restart-btn">🔄 重来</button>
+    <button class="btn-primary-small" id="next-btn">📅 明日预告</button>
+  </div>
+</div>
+</div>
+<div class="answer-list-overlay" id="answer-list-overlay">
+  <div class="answer-list-card"><h3>📋 题目及答案清单</h3><div id="answer-list-content"></div><button class="al-close" id="answer-list-close">关闭</button></div>
+</div>
+<script>
+// ============================================================
+//  DAY 6 — 北师大版五下 · 统计图表与平均数
+// ============================================================
+function shuffleArr(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+function pickQ(pool,n){if(!pool||pool.length===0)return[];return shuffleArr(pool).slice(0,Math.min(n,pool.length));}
+const DAY6_BANK = {
+  title:'数据与分析 · 北师大版五下 · 统计图表与平均数',
+  calc: [
+    {difficulty:'easy',question:'条形统计图能看出数量的____。',options:['多少', '变化趋势', '比例', '分布'],answer:0,explanation:'直观比较数量'},
+    {difficulty:'easy',question:'折线统计图反映数据的____。',options:['变化趋势', '多少', '比例', '分布'],answer:0,explanation:'显示增减变化'},
+    {difficulty:'easy',question:'平均数=总数÷____。',options:['个数', '份数', '总和', '和'],answer:0,explanation:'平均数公式'},
+    {difficulty:'medium',question:'2,3,5,7,8的平均数是____。',options:['5', '25', '4', '6'],answer:0,explanation:'25÷5=5'},
+    {difficulty:'medium',question:'10,20,30的平均数是____。',options:['20', '60', '30', '10'],answer:0,explanation:'60÷3=20'},
+    {difficulty:'medium',question:'4,6,8,6,6的众数是____。',options:['6', '4', '8', '5'],answer:0,explanation:'6出现3次'},
+    {difficulty:'medium',question:'1,3,5,7,9的中位数是____。',options:['5', '3', '7', '4'],answer:0,explanation:'中间位置的数5'},
+    {difficulty:'hard',question:'5个数平均12，前4个和40，第5个？',options:['20', '60', '8', '10'],answer:0,explanation:'60-40=20'},
+    {difficulty:'medium',question:'扇形统计图表示____。',options:['各部分占比', '数量多少', '变化趋势', '分布'],answer:0,explanation:'展示百分比'},
+    {difficulty:'hard',question:'2,4,6,8,10,12的中位数是____。',options:['7', '6', '8', '7.5'],answer:0,explanation:'偶数个取中间两平均：(6+8)/2=7'},
+    {difficulty:'hard',question:'最大最小值的差叫____。',options:['极差', '方差', '标准差', '平均数'],answer:0,explanation:'极差=最大值-最小值'},
+    {difficulty:'medium',question:'统计一个月的温度变化用____。',options:['折线', '条形', '扇形', '柱状'],answer:0,explanation:'折线适合变化趋势'},
+    {difficulty:'medium',question:'比较各班人数用____。',options:['条形', '折线', '扇形', '饼图'],answer:0,explanation:'条形适合比较多少'},
+    {difficulty:'medium',question:'5次成绩85,90,88,92,85平均分？',options:['88', '85', '90', '87'],answer:0,explanation:'440÷5=88'},
+    {difficulty:'hard',question:'3,3,5,7,9,9的众数是____。',options:['3和9', '3', '9', '5'],answer:0,explanation:'3和9都出现2次'},
+    {difficulty:'hard',question:'平均数____极端值影响。',options:['容易受', '不受', '很少受', '不确定'],answer:0,explanation:'平均数易受极端值影响'},
+    {difficulty:'medium',question:'收集数据不包括____。',options:['猜测', '调查', '测量', '实验'],answer:0,explanation:'数据需科学收集'}
+  ],
+  concept: [
+    {difficulty:'easy',question:'统计步骤：收集→____→分析。',options:['整理数据', '猜测数据', '删除数据', '画图'],answer:0,explanation:'先整理再分析'},
+    {difficulty:'medium',question:'平均数反映数据的____水平。',options:['总体', '最高', '最低', '中间'],answer:0,explanation:'反映整体水平'},
+    {difficulty:'medium',question:'折线上的点表示____。',options:['每个时间的数据', '变化快慢', '平均增速', '总和'],answer:0,explanation:'每个点一个数据'},
+    {difficulty:'hard',question:'数据变化不大时折线____。',options:['平缓', '陡峭', '上升', '下降'],answer:0,explanation:'变化小平缓'},
+    {difficulty:'medium',question:'平均数、中位数、众数都是____量。',options:['统计', '长度', '面积', '体积'],answer:0,explanation:'都是统计量'},
+    {difficulty:'hard',question:'中位数不受____影响。',options:['极端值', '数量', '总值', '平均数'],answer:0,explanation:'只关注中间位置'},
+    {difficulty:'medium',question:'条形统计图宽窄____。',options:['一样', '不一样', '可大可小', '无所谓'],answer:0,explanation:'宽度相同，高度表数量'},
+    {difficulty:'easy',question:'数据必须保证____。',options:['真实准确', '数量多', '好看', '复杂'],answer:0,explanation:'真实准确才有意义'},
+    {difficulty:'medium',question:'复式折线图可以____。',options:['比较两组数据', '只看一组', '看总和', '算平均'],answer:0,explanation:'便于比较两组变化'},
+    {difficulty:'hard',question:'绘制折线图步骤：定轴→____→连线。',options:['描点', '计算', '求和', '排序'],answer:0,explanation:'先定轴再描点连线'},
+    {difficulty:'hard',question:'平均身高145cm说明____。',options:['有人高有人低', '全部145', '无人比145高', '无人比145低'],answer:0,explanation:'平均数反映整体'},
+    {difficulty:'easy',question:'想表示爱好分布用____图。',options:['扇形', '条形', '折线', '柱状'],answer:0,explanation:'扇形展示占比'},
+    {difficulty:'medium',question:'数据收集要保证____。',options:['真实性和准确性', '数量多', '好看', '复杂'],answer:0,explanation:'真实准确'}
+  ],
+  apply: [
+    {difficulty:'medium',question:'5次跳绳120,135,128,140,132，平均多少？',answer:'131下',adultReview:true,explanation:'655÷5=131'},
+    {difficulty:'medium',question:'前3数平均15后2数平均25，5个数的平均？',answer:'19',adultReview:true,explanation:'(45+50)÷5=19'},
+    {difficulty:'hard',question:'甲组4人平均88乙组6人平均93，两组平均？',answer:'91分',adultReview:true,explanation:'(352+558)÷10=91'},
+    {difficulty:'hard',question:'一周气温：25,27,26,28,29,30,28，平均？',answer:'约27.6°C',adultReview:true,explanation:'193÷7≈27.6'},
+    {difficulty:'medium',question:'4组种树15,20,22,18棵，平均每组？',answer:'18.75棵',adultReview:true,explanation:'75÷4=18.75'}
+  ],
+  boss: [
+    {difficulty:'hard',question:'前4次平均85，第5次考多少使平均达88？',answer:'100分',adultReview:true,explanation:'5×88-4×85=100'},
+    {difficulty:'hard',question:'10个数平均20，去掉2个后平均18，去掉的和？',answer:'56',adultReview:true,explanation:'200-144=56'},
+    {difficulty:'hard',question:'语文数学平均92，加英语后平均90，英语？',answer:'86分',adultReview:true,explanation:'270-184=86'},
+    {difficulty:'hard',question:'5个连续自然数平均13，中位数？',answer:'13',adultReview:true,explanation:'连续自然数平均数=中位数'},
+    {difficulty:'hard',question:'15个数平均12，每个加5，新平均数？',answer:'17',adultReview:true,explanation:'12+5=17'}
+  ],
+};
+
+function makeQuestions(day){
+  const bank = DAY6_BANK;
+  return [
+    ...pickQ(bank.calc,17).map((q,i)=>({...q,id:'c'+(i+1),stage:'calc'})),
+    ...pickQ(bank.concept,13).map((q,i)=>({...q,id:'g'+(i+1),stage:'concept'})),
+    ...pickQ(bank.apply,5).map((q,i)=>({...q,id:'a'+(i+1),stage:'apply',adultReview:true,time_limit:60})),
+    ...pickQ(bank.boss,5).map((q,i)=>({...q,id:'b'+(i+1),stage:'boss',adultReview:true,time_limit:60}))
+  ];
+}
+const CURRENT_DAY = 'day6';
+const QUESTIONS = makeQuestions(CURRENT_DAY);
+const DAY_TITLE = DAY6_BANK.title;
+const dayNum = 6;
+const game = {
+  state:'idle',stage:0,qIndex:0,score:0,streak:0,maxStreak:0,
+  wrongQs:[], reviewMode:false,
+  results:{calc:{correct:0,total:0,score:0},concept:{correct:0,total:0,score:0},apply:{correct:0,total:0,score:0},boss:{correct:0,total:0,score:0}},
+  timer:null,timerRemaining:0,timerTotal:0,answered:false
+};
+const STAGE_KEYS = ['calc','concept','apply','boss'];
+const STAGE_NAMES = ['口算速递','概念通关','应用挑战','Boss 关'];
+const STAGE_BADGES = ['📝','🧠','🎯','⚡'];
+const STAGE_DESCS = ['17 道计算题','13 道概念题','5 道应用题 · 大人批改','5 道 Boss 题 · 限时 60 秒 · 大人批改'];
+const STAGE_HINTS = ['Ready?','继续加油！','在草稿纸上算好，填答案','限时 60 秒，写答案提交！'];
+const $ = id => document.getElementById(id);
+let currentStageQuestions = [];
+function getStageQs(stage) { return QUESTIONS.filter(q => q.stage === STAGE_KEYS[stage]); }
+function doLoading(cb) {
+  let p=0; const msgs=['准备出发…','加载数学地图…','整理运算公式…','检查计算装备…','一切就绪！'];
+  const iv=setInterval(()=>{p+=5;$('loading-bar').style.width=Math.min(p,100)+'%';
+    $('loading-text').textContent=msgs[Math.min(Math.floor(p/25),4)];
+    if(p>=100){clearInterval(iv);setTimeout(()=>{$('loading').classList.add('done');
+      setTimeout(()=>{$('loading').classList.add('hidden');$('start').classList.remove('hidden');},500);if(cb)cb();},300);}},40);
+}
+$('start-btn').addEventListener('click',()=>{
+  $('start').classList.add('hidden');
+  game.stage=0;game.qIndex=0;game.score=0;game.streak=0;game.maxStreak=0;
+  STAGE_KEYS.forEach(k=>{game.results[k]={correct:0,total:getStageQs(STAGE_KEYS.indexOf(k)).length,score:0};});
+  currentStageQuestions=getStageQs(0);
+  showStageTransition(0,()=>{$('game').classList.remove('hidden');showQuestion();});
+});
+function showStageTransition(stage,cb){
+  game.state='transition';
+  $('stg-icon').textContent=STAGE_BADGES[stage];
+  $('stg-name').textContent=STAGE_NAMES[stage];
+  $('stg-desc').textContent=STAGE_DESCS[stage];
+  $('stg-hint').textContent=STAGE_HINTS[stage];
+  $('stage-transition').classList.remove('hidden');
+  setTimeout(()=>{$('stage-transition').classList.add('hidden');if(cb)cb();},1800);
+}
+function shuffleOptions(q){
+  if(!q.options)return null;
+  const indices=q.options.map((_,i)=>i);
+  for(let i=indices.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[indices[i],indices[j]]=[indices[j],indices[i]];}
+  const shuffledOpts=indices.map(i=>q.options[i]);
+  const newAnswer=indices.indexOf(q.answer);
+  return {options:shuffledOpts,answer:newAnswer};
+}
+function showQuestion(){
+  if(game.qIndex>=currentStageQuestions.length){endStage();return;}
+  const q=currentStageQuestions[game.qIndex];
+  game.answered=false;game.state='playing';
+  $('stage-badge').textContent=STAGE_BADGES[game.stage];
+  $('stage-name-bar').textContent=STAGE_NAMES[game.stage];
+  updateScoreBar();
+  const totalQ=game.reviewMode ? currentStageQuestions.length : QUESTIONS.length;
+  const doneQ=game.reviewMode ? game.qIndex : getDoneCount();
+  $('progress-fill').style.width=Math.min(Math.round(doneQ/totalQ*100),100)+'%';
+  $('progress-label').textContent=`${doneQ+1} / ${totalQ}`;
+  const typeMap={'calc':['计算题','calc'],'concept':['概念题','concept'],'apply':['应用题','apply'],'boss':['Boss题','boss']};
+  const [tLabel,tClass]=typeMap[q.stage]||['题',''];
+  const tag=$('q-type-tag');tag.textContent=tLabel;tag.className='question-type-tag '+tClass;
+  $('q-diff').textContent='· '+({easy:'简单',medium:'中等',hard:'困难'}[q.difficulty]||q.difficulty);
+  const container=$('q-container');
+  container.innerHTML=`<div class="question-text" id="q-text">${q.question}</div>`;
+  const grid=$('options-grid');grid.innerHTML='';grid.style.display='';
+  if(q.adultReview){
+    grid.style.display='none';renderPaperUI(q);startTimer(q);return;
+  }
+  const labels=['A','B','C','D'];
+  const shuffled=shuffleOptions(q);
+  const opts=shuffled||{options:q.options,answer:q.answer};
+  const curAnswer=opts.answer;
+  opts.options.forEach((opt,i)=>{
+    const btn=document.createElement('button');btn.className='option-btn';
+    btn.innerHTML=`<span class="opt-label">${labels[i]}</span>${opt}`;
+    btn.dataset.index=i;
+    function handleOpt(){handleAnswerWithCorrect(i,curAnswer,q);}
+    btn.addEventListener('click',handleOpt);
+    btn.addEventListener('touchend',function(e){e.preventDefault();handleOpt();});
+    grid.appendChild(btn);
+  });
+  startTimer(q);
+}
+function getDoneCount(){
+  let c=0;
+  if(game.stage===0)c=game.qIndex;
+  else if(game.stage===1)c=getStageQs(0).length+game.qIndex;
+  else if(game.stage===2)c=getStageQs(0).length+getStageQs(1).length+game.qIndex;
+  else c=getStageQs(0).length+getStageQs(1).length+getStageQs(2).length+game.qIndex;
+  return c;
+}
+function renderPaperUI(q){
+  const container=$('q-container');
+  const note=q.stage==='boss'?'⏱ 建议 60 秒内完成，请在纸上工整写出计算过程和答案':'📝 请在纸上工整写出计算过程和答案，完成后点"下一题"';
+  container.innerHTML+=`
+    <div style="margin-top:16px;padding:18px;background:#FFF8E1;border-radius:var(--radius-sm);font-size:14px;border-left:4px solid #F39C12;color:#5D4E37;line-height:1.6;">✏️ ${note}</div>
+    <button id="paper-done-btn" style="margin-top:18px;width:100%;padding:16px;background:linear-gradient(135deg,var(--c-primary),var(--c-primary-dark));color:#fff;border:none;border-radius:var(--radius-md);font-size:17px;font-weight:700;cursor:pointer;letter-spacing:2px;">✅ 已完成，下一题</button>`;
+  function advancePaper(){
+    if(game.answered) return;
+    if(game.timer) clearInterval(game.timer);
+    game.answered=true;
+    try{game.qIndex++;if(game.qIndex>=currentStageQuestions.length){endStage();}else showQuestion();}
+    catch(e){console.error(e);}
+  }
+  $('paper-done-btn').addEventListener('click',advancePaper);
+  $('paper-done-btn').addEventListener('touchend',function(e){e.preventDefault();advancePaper();});
+}
+function startTimer(q){
+  const timeLimit=q.time_limit||(q.difficulty==='easy'?15:q.difficulty==='medium'?20:25);
+  game.timerRemaining=timeLimit;game.timerTotal=timeLimit;
+  $('timer-text').textContent=timeLimit;
+  const fill=$('timer-fill');fill.style.width='100%';fill.classList.remove('warning');
+  clearInterval(game.timer);
+  game.timer=setInterval(()=>{
+    game.timerRemaining--;
+    $('timer-text').textContent=game.timerRemaining;
+    fill.style.width=Math.round(game.timerRemaining/timeLimit*100)+'%';
+    if(game.timerRemaining<=5)fill.classList.add('warning');
+    if(game.timerRemaining<=0){clearInterval(game.timer);if(!game.answered)handleTimeUp();}
+  },1000);
+}
+function handleTimeUp(){
+  const q=currentStageQuestions[game.qIndex];
+  if(!q) return;
+  game.answered=true;
+  if(game.timer) clearInterval(game.timer);
+  if(q.adultReview){
+    try{game.qIndex++;if(game.qIndex>=currentStageQuestions.length){endStage();}else showQuestion();}
+    catch(e){console.error(e);}
+  } else { handleAnswerWithCorrect(-1,-2,q); }
+}
+function handleAnswerWithCorrect(selectedIdx,correctIdx,q){
+  if(game.answered)return;
+  game.answered=true; clearInterval(game.timer);
+  const isCorrect=selectedIdx===correctIdx;
+  const btns=document.querySelectorAll('.option-btn');
+  btns.forEach((b,i)=>{b.classList.add('disabled');if(i===correctIdx)b.classList.add('correct');else if(i===selectedIdx&&selectedIdx!==correctIdx)b.classList.add('wrong');});
+  if(isCorrect){
+    const timeBonus=game.timerRemaining>0?Math.round(game.timerRemaining/2):0;
+    const streakBonus=Math.min(game.streak*5,25);
+    const diffBonus={easy:0,medium:10,hard:20}[q.difficulty]||0;
+    const pts=50+timeBonus+streakBonus+diffBonus;
+    game.score+=pts;game.streak++;game.maxStreak=Math.max(game.maxStreak,game.streak);
+    game.results[q.stage].correct++;onCorrectAnswer(q,pts);
+  } else { game.streak=0;onWrongAnswer(q); }
+  game.results[q.stage].score+=isCorrect?1:0;
+  updateScoreBar();
+}
+function onCorrectAnswer(q,pts){
+  if(!game.reviewMode){const idx=game.wrongQs.findIndex(wq=>wq.id===q.id);if(idx!==-1)game.wrongQs.splice(idx,1);}
+  showFeedback(true,q,pts);
+}
+function onWrongAnswer(q){
+  game.streak=0;updateScoreBar();
+  if(!game.reviewMode){const exists=game.wrongQs.some(wq=>wq.id===q.id);if(!exists)game.wrongQs.push({...q,wrongIdx:game.wrongQs.length});}
+  showFeedback(false,q,0);
+}
+function updateScoreBar(){ $('top-score').textContent='⭐ '+game.score; $('top-streak').textContent='🔥 '+game.streak; }
+function showFeedback(isCorrect,q,pts){
+  $('fb-icon').textContent=isCorrect?'✅':'❌';
+  $('fb-score').textContent=isCorrect?'+'+pts:'';
+  $('fb-detail').textContent=isCorrect?'回答正确！':'答错了~';
+  const explain=$('fb-explain');explain.textContent=q.explanation||'';explain.classList.remove('hidden');
+  $('fb-answer').textContent='正确答案：'+q.answer; $('fb-answer').classList.remove('hidden');
+  const overlay=$('feedback-overlay');overlay.classList.add('show');
+  const nextBtn=$('fb-next-btn');nextBtn.classList.remove('hidden');nextBtn.disabled=true;nextBtn.textContent='下一题 (5)';
+  let cd=5;const cdTimer=setInterval(()=>{cd--;nextBtn.textContent=`下一题 (${cd})`;if(cd<=0){clearInterval(cdTimer);nextBtn.disabled=false;nextBtn.textContent='下一题 →';}},1000);
+}
+$('fb-next-btn').addEventListener('click',()=>{try{$('feedback-overlay').classList.remove('show');game.qIndex++;if(game.qIndex>=currentStageQuestions.length){endStage();}else showQuestion();}catch(e){console.error(e);}});
+$('fb-next-btn').addEventListener('touchend',function(e){e.preventDefault();$('fb-next-btn').click();});
+function endStage(){
+  game.state='transition'; game.stage++;
+  if(game.stage>=STAGE_KEYS.length){ showResults(); return; }
+  currentStageQuestions=getStageQs(game.stage); game.qIndex=0;
+  showStageTransition(game.stage,()=>showQuestion());
+}
+function showResults(){
+  $('game').classList.add('hidden');
+  const autoCorrect=STAGE_KEYS.slice(0,2).reduce((s,k)=>s+game.results[k].correct,0);
+  const autoTotal=STAGE_KEYS.slice(0,2).reduce((s,k)=>s+game.results[k].total,0);
+  const paperTotal=STAGE_KEYS.slice(2).reduce((s,k)=>s+game.results[k].total,0);
+  const acc=autoTotal>0?Math.round(autoCorrect/autoTotal*100):0;
+  const s=game.score;
+  $('result-total-score').textContent=s;
+  $('result-accuracy').textContent=acc+'%（自动判题部分）';
+  $('result-streak').textContent=game.maxStreak;
+  const rank=s>=2000?'🏅 数学小天才！':s>=1400?'🌟 运算达人！':s>=800?'💪 继续加油！':'📚 多多练习哦！';
+  $('result-rank').textContent='💡 '+rank+' (得分：'+s+'）';
+  STAGE_KEYS.forEach((k,i)=>{const r=game.results[k];
+    if(i>=2){document.getElementById('r-'+k).textContent=r.total+' 题需批改';document.getElementById('r-'+k+'-pct').textContent='📋 查看下方清单';}
+    else{document.getElementById('r-'+k).textContent=r.correct+'/'+r.total;document.getElementById('r-'+k+'-pct').textContent=r.total>0?Math.round(r.correct/r.total*100)+'%':'';}
+  });
+  $('r-total-detail').textContent=s+' 分（自动判题）';
+  $('r-total-pct').textContent=(QUESTIONS.length>0?Math.round(autoCorrect/(autoTotal+paperTotal)*100):0)+'%（含待批改）';
+  $('result-sub').textContent='Day 6 · '+DAY_TITLE;
+  const wrongCount=game.wrongQs.length;
+  if(wrongCount>0){$('wrong-count').textContent=wrongCount;$('result-redo-area').classList.remove('hidden');}
+  else{$('result-redo-area').classList.add('hidden');}
+  $('results').classList.remove('hidden');
+}
+$('redo-btn').addEventListener('click',function startReviewMode(){
+  if(game.wrongQs.length===0)return;
+  game.reviewMode=true;currentStageQuestions=[...game.wrongQs];game.qIndex=0;
+  $('results').classList.add('hidden');$('game').classList.remove('hidden');
+  showStageTransition(0,()=>showQuestion());
+});
+$('restart-btn').addEventListener('click',()=>location.reload());
+function renderAnswerList(){
+  const paperQs=QUESTIONS.filter(q=>q.adultReview);
+  const stages={apply:'🎯 应用挑战',boss:'⚡ Boss 关'};
+  let html='';
+  paperQs.forEach((q,i)=>{const sl=stages[q.stage]||q.stage;if(i===0||paperQs[i-1].stage!==q.stage)html+=`<div class="al-section"><div class="al-section-title">${sl}</div>`;
+    html+=`<div class="al-item"><div class="al-q">${i+1}. ${q.question}</div><div class="al-a">✅ 答案：${q.answer}</div></div>`;
+    if(i===paperQs.length-1||paperQs[i+1].stage!==q.stage)html+=`</div>`;
+  });
+  $('answer-list-content').innerHTML=html||'暂无题目';
+}
+$('answer-list-btn').addEventListener('click',()=>{renderAnswerList();$('answer-list-overlay').classList.add('show');});
+$('answer-list-close').addEventListener('click',()=>{$('answer-list-overlay').classList.remove('show');});
+doLoading();
+</script>
+</body>
+</html>
