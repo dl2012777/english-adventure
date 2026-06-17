@@ -441,12 +441,13 @@ function startTimer(q){
 function handleTimeUp(){
   const q=currentStageQuestions[game.qIndex];
   if(!q) return;
-  game.answered=true;
   if(game.timer) clearInterval(game.timer);
   if(q.adultReview){
+    game.answered=true;
     try{game.qIndex++;if(game.qIndex>=currentStageQuestions.length){endStage();}else showQuestion();}
     catch(e){console.error(e);}
-  } else { handleAnswerWithCorrect(-1,-2,q); }
+  }
+  // For calc/concept: timer expired but DON'T auto-answer, let player still click
 }
 function handleAnswerWithCorrect(selectedIdx,correctIdx,q){
   if(game.answered)return;
@@ -494,28 +495,38 @@ function endStage(){
   showStageTransition(game.stage,()=>showQuestion());
 }
 function showResults(){
+  try{
   $('game').classList.add('hidden');
-  const autoCorrect=STAGE_KEYS.slice(0,2).reduce((s,k)=>s+game.results[k].correct,0);
-  const autoTotal=STAGE_KEYS.slice(0,2).reduce((s,k)=>s+game.results[k].total,0);
-  const paperTotal=STAGE_KEYS.slice(2).reduce((s,k)=>s+game.results[k].total,0);
+  const autoCorrect=STAGE_KEYS.slice(0,2).reduce((s,k)=>s+(game.results[k]?game.results[k].correct:0),0);
+  const autoTotal=STAGE_KEYS.slice(0,2).reduce((s,k)=>s+(game.results[k]?game.results[k].total:0),0);
+  const paperTotal=STAGE_KEYS.slice(2).reduce((s,k)=>s+(game.results[k]?game.results[k].total:0),0);
   const acc=autoTotal>0?Math.round(autoCorrect/autoTotal*100):0;
-  const s=game.score;
+  const s=game.score||0;
   $('result-total-score').textContent=s;
   $('result-accuracy').textContent=acc+'%（自动判题部分）';
-  $('result-streak').textContent=game.maxStreak;
+  $('result-streak').textContent=game.maxStreak||0;
   const rank=s>=2000?'🏅 数学小天才！':s>=1400?'🌟 运算达人！':s>=800?'💪 继续加油！':'📚 多多练习哦！';
   $('result-rank').textContent='💡 '+rank+' (得分：'+s+'）';
-  STAGE_KEYS.forEach((k,i)=>{const r=game.results[k];
-    if(i>=2){document.getElementById('r-'+k).textContent=r.total+' 题需批改';document.getElementById('r-'+k+'-pct').textContent='📋 查看下方清单';}
-    else{document.getElementById('r-'+k).textContent=r.correct+'/'+r.total;document.getElementById('r-'+k+'-pct').textContent=r.total>0?Math.round(r.correct/r.total*100)+'%':'';}
+  STAGE_KEYS.forEach((k,i)=>{const r=game.results[k]||{correct:0,total:0};
+    if(i>=2){
+      const el=document.getElementById('r-'+k);if(el)el.textContent=(r.total||5)+' 题需批改';
+      const pctEl=document.getElementById('r-'+k+'-pct');if(pctEl)pctEl.textContent='📋 查看下方清单';
+    }else{
+      const el=document.getElementById('r-'+k);if(el)el.textContent=(r.correct||0)+'/'+(r.total||0);
+      const pctEl=document.getElementById('r-'+k+'-pct');if(pctEl)pctEl.textContent=(r.total>0?Math.round((r.correct||0)/r.total*100):0)+'%';
+    }
   });
-  $('r-total-detail').textContent=s+' 分（自动判题）';
-  $('r-total-pct').textContent=(QUESTIONS.length>0?Math.round(autoCorrect/(autoTotal+paperTotal)*100):0)+'%（含待批改）';
-  $('result-sub').textContent='Day 4 · '+DAY_TITLE;
-  const wrongCount=game.wrongQs.length;
-  if(wrongCount>0){$('wrong-count').textContent=wrongCount;$('result-redo-area').classList.remove('hidden');}
-  else{$('result-redo-area').classList.add('hidden');}
-  $('results').classList.remove('hidden');
+  const td=document.getElementById('r-total-detail');if(td)td.textContent=s+' 分（自动判题）';
+  const tp=document.getElementById('r-total-pct');if(tp)tp.textContent=(QUESTIONS.length>0&&(autoTotal+paperTotal)>0?Math.round(autoCorrect/(autoTotal+paperTotal)*100):0)+'%（含待批改）';
+  const rs=document.getElementById('result-sub');if(rs)rs.textContent='Day 4 · '+(DAY_TITLE||'');
+  const wrongCount=game.wrongQs?game.wrongQs.length:0;
+  const redoArea=document.getElementById('result-redo-area');
+  const wc=document.getElementById('wrong-count');
+  if(wrongCount>0){if(wc)wc.textContent=wrongCount;if(redoArea)redoArea.classList.remove('hidden');}
+  else{if(redoArea)redoArea.classList.add('hidden');}
+  const resultsEl=document.getElementById('results');
+  if(resultsEl)resultsEl.classList.remove('hidden');
+  }catch(e){console.error('showResults error:',e);alert('出错了，请刷新页面重试');}
 }
 $('redo-btn').addEventListener('click',function startReviewMode(){
   if(game.wrongQs.length===0)return;
