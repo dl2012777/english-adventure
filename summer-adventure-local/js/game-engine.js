@@ -95,6 +95,10 @@ const GameEngine = {
     this._shuffleAllOptions(grouped);
     Object.keys(grouped).forEach(k => this._shuffle(grouped[k]));
 
+    // 备份原始听力题（防御性检查用）
+    this._rawListeningCount = (grouped.listening || []).length;
+    this._rawListeningQuestions = (grouped.listening || []).slice();
+
     // 根据权重分配题数和分值（最大题数：词汇20/语法20/听力12/跟读12）
     var weights = GameEngine._getStageWeights(subject);
     var MAX_COUNTS = { vocab:25, grammar:25, listening:12, speaking:12 };
@@ -120,6 +124,13 @@ const GameEngine = {
       grouped[k] = grouped[k].slice(0, bestC);
       grouped[k].forEach(function(q) { q.pointValue = bestS; });
     });
+
+    // 🔒 防御性检查：确保英语听力题不被静默跳过
+    if (subject !== 'math' && this._rawListeningCount > 0 && (!grouped.listening || grouped.listening.length === 0)) {
+      console.warn('[GameEngine] 听力题被意外跳过！原始数量=' + this._rawListeningCount + '，强制恢复至少2题');
+      grouped.listening = (this._rawListeningQuestions || []).slice(0, 2);
+      grouped.listening.forEach(function(q) { q.pointValue = 5; });
+    }
     // Math 应用题: force exactly 3 questions, distribute weight as evenly as possible
     // e.g. weight 28 -> [10, 9, 9] = 28 total
     if (subject === 'math' && weights.speaking > 0 && grouped.speaking && grouped.speaking.length >= 3) {
