@@ -1817,7 +1817,7 @@ window.QUESTIONS = {
     {
       "id": "en-d2-v3",
       "type": "vocabulary",
-      "difficulty": "medium",
+      "difficulty": "easy",
       "pointValue": 100,
       "question": "\"invite\"的中文是？",
       "options": [
@@ -1828,6 +1828,111 @@ window.QUESTIONS = {
       ],
       "answer": 0,
       "explanation": "invite=邀请"
+    },
+    {
+      "id": "en-d2-v4",
+      "type": "vocabulary",
+      "difficulty": "easy",
+      "pointValue": 100,
+      "question": "\"birthday\"的中文是？",
+      "options": [
+        "生日",
+        "出生日",
+        "蛋糕",
+        "聚会"
+      ],
+      "answer": 0,
+      "explanation": "birthday=生日"
+    },
+    {
+      "id": "en-d2-v5",
+      "type": "vocabulary",
+      "difficulty": "easy",
+      "pointValue": 100,
+      "question": "\"party\"的中文是？",
+      "options": [
+        "聚会/派对",
+        "公园",
+        "商店",
+        "学校"
+      ],
+      "answer": 0,
+      "explanation": "party=聚会/派对"
+    },
+    {
+      "id": "en-d2-v6",
+      "type": "vocabulary",
+      "difficulty": "medium",
+      "pointValue": 100,
+      "question": "\"invitation\"的中文是？",
+      "options": [
+        "邀请函",
+        "邀请人",
+        "被邀请",
+        "邀请过"
+      ],
+      "answer": 0,
+      "explanation": "invitation=邀请函（名词）"
+    },
+    {
+      "id": "en-d2-v7",
+      "type": "vocabulary",
+      "difficulty": "medium",
+      "pointValue": 100,
+      "question": "\"celebrate\"的中文是？",
+      "options": [
+        "庆祝",
+        "准备",
+        "参加",
+        "忘记"
+      ],
+      "answer": 0,
+      "explanation": "celebrate=庆祝"
+    },
+    {
+      "id": "en-d2-v8",
+      "type": "vocabulary",
+      "difficulty": "easy",
+      "pointValue": 100,
+      "question": "\"first\"的中文是？",
+      "options": [
+        "第一",
+        "第二",
+        "最后",
+        "第三"
+      ],
+      "answer": 0,
+      "explanation": "first=第一"
+    },
+    {
+      "id": "en-d2-v9",
+      "type": "vocabulary",
+      "difficulty": "medium",
+      "pointValue": 100,
+      "question": "\" nineteenth\"的中文是？",
+      "options": [
+        "第十九",
+        "第九",
+        "第九十",
+        "第九十九"
+      ],
+      "answer": 0,
+      "explanation": "nineteenth=第十九"
+    },
+    {
+      "id": "en-d2-v10",
+      "type": "vocabulary",
+      "difficulty": "easy",
+      "pointValue": 100,
+      "question": "\"gift\"的中文是？",
+      "options": [
+        "礼物",
+        "卡片",
+        "信",
+        "照片"
+      ],
+      "answer": 0,
+      "explanation": "gift=礼物"
     },
     {
       "id": "en-d2-g1",
@@ -1860,6 +1965,176 @@ window.QUESTIONS = {
       "explanation": "祈使句用动词原形"
     },
     {
+      "id": "en-d2-g3",
+      "type": "grammar",
+      "difficulty": "easy",
+      "pointValue": 100,
+      "question": "I come to school _____ bus.",
+      "options": [
+        "by",
+        "on",
+        "in",
+        "with"
+      ],
+      "answer": 0,
+      "explanation": "by+交通工具"
+    },
+    {
+      "id": "en-d2-g4",
+      "type": "grammar",
+      "difficulty": "medium",
+      "pointValue": 100,
+      "question": "She _____ to my party yesterday.",
+      "options": [
+        "came",
+        "come",
+        "comes",
+        "coming"
+      ],
+      "answer": 0,
+      "explanation": "yesterday用过去时came"
+    },
+    {
+      "id": "en-d2-g5",
+      "type": "grammar",
+      "difficulty": "easy",
+      "pointValue": 100,
+      "question": "Let's _____ a birthday cake.",
+      "options": [
+        "make",
+        "makes",
+        "making",
+        "made"
+      ],
+      "answer": 0,
+      "explanation": "Let's后接动词原形"
+    },
+    {
+      "id": "en-d2-g6",
+      "type": "grammar",
+      "difficulty": "medium",
+      "pointValue": 100,
+      "question": "哪一处有错误？\"He invite me to his party.\"",
+      "options": [
+        "invite→invites",
+        "me→I",
+        "to→for",
+        "his→her"
+      ],
+      "answer": 0,
+      "explanation": "He用第三人称单数invites"
+    },
+    {
+      "id": "en-d2-g7",
+      "type": "grammar",
+      "difficulty": "easy",
+      "pointValue": 100,
+      "question": "My birthday is _____ May.",
+      "options": [
+        "in",
+        "on",
+        "at",
+        "by"
+      ],
+      "answer": 0,
+      "explanation": "月份用in"
+    },
+    {
+      "id": "en-d2-g8",
+      "type": "grammar",
+      "difficulty": "medium",
+      "pointValue": 100,
+      "question": "选出正确的句子：",
+      "options": [
+        "My birthday is on June 1st.",
+        "My birthday is in June 1st.",
+        "My birthday is at June 1st.",
+        "My birthday June 1st."
+      ],
+      "answer": 0,
+      "explanation": "具体日期用on"
+    },
+    {
+      "id": "en-d2-l1",
+      "type": "listening",
+      "difficulty": "medium",
+      "pointValue": 100,
+      "question": "请听句子选正确翻译",
+      "options": [
+        "我的生日在七月十五日。",
+        "我的生日在五月十五日。",
+        "我的生日在六月十五日。",
+        "我的生日在八月十五日。"
+      ],
+      "answer": 0,
+      "explanation": "\"My birthday is on July 15th.\"的翻译",
+      "textToSpeak": "My birthday is on July 15th."
+    },
+    {
+      "id": "en-d2-l2",
+      "type": "listening",
+      "difficulty": "medium",
+      "pointValue": 100,
+      "question": "请听句子选正确翻译",
+      "options": [
+        "请来参加我的聚会。",
+        "请来参加我的生日。",
+        "请来参加我的派对。",
+        "请来参加我的学校。"
+      ],
+      "answer": 0,
+      "explanation": "\"Please come to my party.\"的翻译",
+      "textToSpeak": "Please come to my party."
+    },
+    {
+      "id": "en-d2-l3",
+      "type": "listening",
+      "difficulty": "medium",
+      "pointValue": 100,
+      "question": "请听句子选正确翻译",
+      "options": [
+        "我想邀请你参加我的生日聚会。",
+        "我想邀请你参加我的生日蛋糕。",
+        "我想邀请你参加我的学校。",
+        "我想邀请你参加我的生日礼物。"
+      ],
+      "answer": 0,
+      "explanation": "\"I want to invite you to my birthday party.\"的翻译",
+      "textToSpeak": "I want to invite you to my birthday party."
+    },
+    {
+      "id": "en-d2-l4",
+      "type": "listening",
+      "difficulty": "medium",
+      "pointValue": 100,
+      "question": "请听句子选正确翻译",
+      "options": [
+        "让我们一起庆祝生日吧！",
+        "让我们一起做蛋糕吧！",
+        "让我们一起唱生日歌吧！",
+        "让我们一起送礼物吧！"
+      ],
+      "answer": 0,
+      "explanation": "\"Let's celebrate the birthday together!\"的翻译",
+      "textToSpeak": "Let's celebrate the birthday together!"
+    },
+    {
+      "id": "en-d2-l5",
+      "type": "listening",
+      "difficulty": "medium",
+      "pointValue": 100,
+      "question": "请听问句选正确回答",
+      "options": [
+        "It's on July 15th.",
+        "It's in July.",
+        "It's at July.",
+        "It July 15th."
+      ],
+      "answer": 0,
+      "explanation": "\"When is your birthday?\"的回答",
+      "textToSpeak": "When is your birthday?"
+    },
+    {
       "id": "en-d2-s1",
       "type": "speaking",
       "difficulty": "easy",
@@ -1867,6 +2142,42 @@ window.QUESTIONS = {
       "question": "请跟读：Please come to my party.",
       "textToSpeak": "Please come to my party.",
       "explanation": "祈使句语调"
+    },
+    {
+      "id": "en-d2-s2",
+      "type": "speaking",
+      "difficulty": "easy",
+      "pointValue": 100,
+      "question": "请跟读：My birthday is on July 15th.",
+      "textToSpeak": "My birthday is on July 15th.",
+      "explanation": "注意日期读法"
+    },
+    {
+      "id": "en-d2-s3",
+      "type": "speaking",
+      "difficulty": "medium",
+      "pointValue": 100,
+      "question": "请跟读：I want to invite you to my party.",
+      "textToSpeak": "I want to invite you to my party.",
+      "explanation": "注意invite的发音"
+    },
+    {
+      "id": "en-d2-s4",
+      "type": "speaking",
+      "difficulty": "medium",
+      "pointValue": 100,
+      "question": "请跟读：Let's celebrate together!",
+      "textToSpeak": "Let's celebrate together!",
+      "explanation": "注意celebrate的发音"
+    },
+    {
+      "id": "en-d2-s5",
+      "type": "speaking",
+      "difficulty": "easy",
+      "pointValue": 100,
+      "question": "请跟读：Happy birthday!",
+      "textToSpeak": "Happy birthday!",
+      "explanation": "生日祝福语"
     },
     {
       "id": "en-d2-b1",
@@ -1882,6 +2193,36 @@ window.QUESTIONS = {
       ],
       "answer": 0,
       "explanation": "具体日期用on"
+    },
+    {
+      "id": "en-d2-b2",
+      "type": "boss",
+      "difficulty": "hard",
+      "pointValue": 100,
+      "question": "\"twentieth\"的中文是？",
+      "options": [
+        "第二十",
+        "第十二",
+        "第二",
+        "第二十一"
+      ],
+      "answer": 0,
+      "explanation": "twentieth=第二十，注意ty和teen的发音区别"
+    },
+    {
+      "id": "en-d2-b3",
+      "type": "boss",
+      "difficulty": "hard",
+      "pointValue": 100,
+      "question": "补全对话：A: When is your birthday? B: _____",
+      "options": [
+        "It's on March 8th.",
+        "It's in March 8th.",
+        "It's at March 8th.",
+        "It March 8th."
+      ],
+      "answer": 0,
+      "explanation": "回答具体日期用It's on + 日期"
     }
   ],
   "en-day3": [
@@ -1931,6 +2272,111 @@ window.QUESTIONS = {
       "explanation": "far from=远离"
     },
     {
+      "id": "en-d3-v4",
+      "type": "vocabulary",
+      "difficulty": "easy",
+      "pointValue": 100,
+      "question": "\"by bike\"的中文是？",
+      "options": [
+        "骑自行车",
+        "乘公共汽车",
+        "步行",
+        "乘地铁"
+      ],
+      "answer": 0,
+      "explanation": "by bike=骑自行车"
+    },
+    {
+      "id": "en-d3-v5",
+      "type": "vocabulary",
+      "difficulty": "easy",
+      "pointValue": 100,
+      "question": "\"by car\"的中文是？",
+      "options": [
+        "乘汽车",
+        "乘公共汽车",
+        "骑自行车",
+        "步行"
+      ],
+      "answer": 0,
+      "explanation": "by car=乘汽车"
+    },
+    {
+      "id": "en-d3-v6",
+      "type": "vocabulary",
+      "difficulty": "medium",
+      "pointValue": 100,
+      "question": "\"underground\"的中文是？",
+      "options": [
+        "地铁",
+        "地下",
+        "地面",
+        "道路"
+      ],
+      "answer": 0,
+      "explanation": "underground=地铁"
+    },
+    {
+      "id": "en-d3-v7",
+      "type": "vocabulary",
+      "difficulty": "medium",
+      "pointValue": 100,
+      "question": "\"traffic\"的中文是？",
+      "options": [
+        "交通",
+        "旅行",
+        "道路",
+        "车辆"
+      ],
+      "answer": 0,
+      "explanation": "traffic=交通"
+    },
+    {
+      "id": "en-d3-v8",
+      "type": "vocabulary",
+      "difficulty": "easy",
+      "pointValue": 100,
+      "question": "\"near\"的中文是？",
+      "options": [
+        "近的",
+        "远的",
+        "快的",
+        "慢的"
+      ],
+      "answer": 0,
+      "explanation": "near=近的"
+    },
+    {
+      "id": "en-d3-v9",
+      "type": "vocabulary",
+      "difficulty": "medium",
+      "pointValue": 100,
+      "question": "\"take\"的中文是？（交通语境）",
+      "options": [
+        "乘坐",
+        "带走",
+        "拿取",
+        "花费"
+      ],
+      "answer": 0,
+      "explanation": "take a bus=乘公共汽车"
+    },
+    {
+      "id": "en-d3-v10",
+      "type": "vocabulary",
+      "difficulty": "easy",
+      "pointValue": 100,
+      "question": "\"school\"的中文是？",
+      "options": [
+        "学校",
+        "商店",
+        "医院",
+        "公园"
+      ],
+      "answer": 0,
+      "explanation": "school=学校"
+    },
+    {
       "id": "en-d3-g1",
       "type": "grammar",
       "difficulty": "easy",
@@ -1976,6 +2422,206 @@ window.QUESTIONS = {
       "explanation": "on foot固定搭配"
     },
     {
+      "id": "en-d3-g4",
+      "type": "grammar",
+      "difficulty": "medium",
+      "pointValue": 100,
+      "question": "_____ does he go to school?",
+      "options": [
+        "How",
+        "What",
+        "Where",
+        "When"
+      ],
+      "answer": 0,
+      "explanation": "问交通方式用How"
+    },
+    {
+      "id": "en-d3-g5",
+      "type": "grammar",
+      "difficulty": "easy",
+      "pointValue": 100,
+      "question": "He _____ to school by bike.",
+      "options": [
+        "goes",
+        "go",
+        "going",
+        "went"
+      ],
+      "answer": 0,
+      "explanation": "He用第三人称单数goes"
+    },
+    {
+      "id": "en-d3-g6",
+      "type": "grammar",
+      "difficulty": "medium",
+      "pointValue": 100,
+      "question": "哪一处有错误？\"He go to school by bus.\"",
+      "options": [
+        "go→goes",
+        "to→for",
+        "by→on",
+        "school→home"
+      ],
+      "answer": 0,
+      "explanation": "He用第三人称单数goes"
+    },
+    {
+      "id": "en-d3-g7",
+      "type": "grammar",
+      "difficulty": "easy",
+      "pointValue": 100,
+      "question": "My home is far _____ school.",
+      "options": [
+        "from",
+        "to",
+        "of",
+        "with"
+      ],
+      "answer": 0,
+      "explanation": "far from=远离"
+    },
+    {
+      "id": "en-d3-g8",
+      "type": "grammar",
+      "difficulty": "medium",
+      "pointValue": 100,
+      "question": "选出正确句子：",
+      "options": [
+        "How do you come to school?",
+        "How are you come to school?",
+        "How does you come to school?",
+        "How is you come to school?"
+      ],
+      "answer": 0,
+      "explanation": "问交通方式用How do you"
+    },
+    {
+      "id": "en-d3-l1",
+      "type": "listening",
+      "difficulty": "medium",
+      "pointValue": 100,
+      "question": "请听句子选正确翻译",
+      "options": [
+        "我乘公共汽车上学。",
+        "我骑自行车上学。",
+        "我步行上学。",
+        "我乘地铁上学。"
+      ],
+      "answer": 0,
+      "explanation": "\"I come to school by bus.\"的翻译",
+      "textToSpeak": "I come to school by bus."
+    },
+    {
+      "id": "en-d3-l2",
+      "type": "listening",
+      "difficulty": "medium",
+      "pointValue": 100,
+      "question": "请听句子选正确翻译",
+      "options": [
+        "我家离学校很远。",
+        "我家离学校很近。",
+        "我家在学校旁边。",
+        "我家在学校对面。"
+      ],
+      "answer": 0,
+      "explanation": "\"My home is far from school.\"的翻译",
+      "textToSpeak": "My home is far from school."
+    },
+    {
+      "id": "en-d3-l3",
+      "type": "listening",
+      "difficulty": "medium",
+      "pointValue": 100,
+      "question": "请听问句选正确回答",
+      "options": [
+        "By bus.",
+        "At 7 o'clock.",
+        "In the morning.",
+        "To school."
+      ],
+      "answer": 0,
+      "explanation": "\"How do you come to school?\"的回答",
+      "textToSpeak": "How do you come to school?"
+    },
+    {
+      "id": "en-d3-l4",
+      "type": "listening",
+      "difficulty": "medium",
+      "pointValue": 100,
+      "question": "请听句子选正确翻译",
+      "options": [
+        "她步行去上学。",
+        "她乘公共汽车去上学。",
+        "她骑自行车去上学。",
+        "她乘地铁去上学。"
+      ],
+      "answer": 0,
+      "explanation": "\"She comes to school on foot.\"的翻译",
+      "textToSpeak": "She comes to school on foot."
+    },
+    {
+      "id": "en-d3-l5",
+      "type": "listening",
+      "difficulty": "medium",
+      "pointValue": 100,
+      "question": "请听句子选正确翻译",
+      "options": [
+        "让我们骑自行车去公园吧。",
+        "让我们乘公共汽车去公园吧。",
+        "让我们步行去公园吧。",
+        "让我们乘地铁去公园吧。"
+      ],
+      "answer": 0,
+      "explanation": "\"Let's go to the park by bike.\"的翻译",
+      "textToSpeak": "Let's go to the park by bike."
+    },
+    {
+      "id": "en-d3-s1",
+      "type": "speaking",
+      "difficulty": "easy",
+      "pointValue": 100,
+      "question": "请跟读：How do you come to school?",
+      "textToSpeak": "How do you come to school?",
+      "explanation": "注意How的语调"
+    },
+    {
+      "id": "en-d3-s2",
+      "type": "speaking",
+      "difficulty": "easy",
+      "pointValue": 100,
+      "question": "请跟读：I come to school by bus.",
+      "textToSpeak": "I come to school by bus.",
+      "explanation": "注意by bus的连读"
+    },
+    {
+      "id": "en-d3-s3",
+      "type": "speaking",
+      "difficulty": "medium",
+      "pointValue": 100,
+      "question": "请跟读：My home is far from school.",
+      "textToSpeak": "My home is far from school.",
+      "explanation": "注意far from的连读"
+    },
+    {
+      "id": "en-d3-s4",
+      "type": "speaking",
+      "difficulty": "medium",
+      "pointValue": 100,
+      "question": "请跟读：She comes to school on foot.",
+      "textToSpeak": "She comes to school on foot.",
+      "explanation": "注意on foot的发音"
+    },
+    {
+      "id": "en-d3-s5",
+      "type": "speaking",
+      "difficulty": "easy",
+      "pointValue": 100,
+      "question": "请跟读：Let's go by bike!",
+      "textToSpeak": "Let's go by bike!",
+      "explanation": "注意Let's的发音"
+    },
+    {
       "id": "en-d3-b1",
       "type": "boss",
       "difficulty": "hard",
@@ -1988,7 +2634,37 @@ window.QUESTIONS = {
         "How is you come to school?"
       ],
       "answer": 0,
-      "explanation": "问交通方式用How do"
+      "explanation": "问交通方式用How do you"
+    },
+    {
+      "id": "en-d3-b2",
+      "type": "boss",
+      "difficulty": "hard",
+      "pointValue": 100,
+      "question": "补全对话：A: How does she come to school? B: _____",
+      "options": [
+        "She comes on foot.",
+        "She come on foot.",
+        "She coming on foot.",
+        "She on foot."
+      ],
+      "answer": 0,
+      "explanation": "She用第三人称单数comes"
+    },
+    {
+      "id": "en-d3-b3",
+      "type": "boss",
+      "difficulty": "hard",
+      "pointValue": 100,
+      "question": "哪个句子是错误的？",
+      "options": [
+        "I go to school by foot.",
+        "I go to school on foot.",
+        "I go to school by bus.",
+        "I go to school by bike."
+      ],
+      "answer": 0,
+      "explanation": "步行用on foot，不用by foot"
     }
   ],
   "en-day4": [
@@ -2261,6 +2937,86 @@ window.QUESTIONS = {
       ],
       "answer": 2,
       "explanation": "teacher是辅音开头用a"
+    },
+    {
+      "id": "en-d4-l1",
+      "type": "listening",
+      "difficulty": "medium",
+      "pointValue": 100,
+      "question": "请听句子选正确翻译",
+      "options": [
+        "我想成为一名老师。",
+        "我想成为一名医生。",
+        "我想成为一名护士。",
+        "我想成为一名飞行员。"
+      ],
+      "answer": 0,
+      "explanation": "\"I want to be a teacher.\"的翻译",
+      "textToSpeak": "I want to be a teacher."
+    },
+    {
+      "id": "en-d4-l2",
+      "type": "listening",
+      "difficulty": "medium",
+      "pointValue": 100,
+      "question": "请听句子选正确翻译",
+      "options": [
+        "她是一名护士。",
+        "她是一名医生。",
+        "她是一名老师。",
+        "她是一名厨师。"
+      ],
+      "answer": 0,
+      "explanation": "\"She is a nurse.\"的翻译",
+      "textToSpeak": "She is a nurse."
+    },
+    {
+      "id": "en-d4-l3",
+      "type": "listening",
+      "difficulty": "medium",
+      "pointValue": 100,
+      "question": "请听问句选正确回答",
+      "options": [
+        "I want to be a doctor.",
+        "I am a doctor.",
+        "I was a doctor.",
+        "I do a doctor."
+      ],
+      "answer": 0,
+      "explanation": "\"What do you want to be?\"的回答",
+      "textToSpeak": "What do you want to be?"
+    },
+    {
+      "id": "en-d4-l4",
+      "type": "listening",
+      "difficulty": "medium",
+      "pointValue": 100,
+      "question": "请听句子选正确翻译",
+      "options": [
+        "他是一名消防员。",
+        "他是一名警察。",
+        "他是一名工人。",
+        "他是一名司机。"
+      ],
+      "answer": 0,
+      "explanation": "\"He is a firefighter.\"的翻译",
+      "textToSpeak": "He is a firefighter."
+    },
+    {
+      "id": "en-d4-l5",
+      "type": "listening",
+      "difficulty": "medium",
+      "pointValue": 100,
+      "question": "请听句子选正确翻译",
+      "options": [
+        "我爸爸是一名司机。",
+        "我妈妈是一名司机。",
+        "我哥哥是一名司机。",
+        "我姐姐是一名司机。"
+      ],
+      "answer": 0,
+      "explanation": "\"My father is a driver.\"的翻译",
+      "textToSpeak": "My father is a driver."
     },
     {
       "id": "en-d4-s1",
@@ -2647,6 +3403,86 @@ window.QUESTIONS = {
       ],
       "answer": 2,
       "explanation": "具体日期用on"
+    },
+    {
+      "id": "en-d5-l1",
+      "type": "listening",
+      "difficulty": "medium",
+      "pointValue": 100,
+      "question": "请听句子选正确翻译",
+      "options": [
+        "这是我的书。",
+        "这是你的书。",
+        "这是他的书。",
+        "这是她的书。"
+      ],
+      "answer": 0,
+      "explanation": "\"This is my book.\"的翻译",
+      "textToSpeak": "This is my book."
+    },
+    {
+      "id": "en-d5-l2",
+      "type": "listening",
+      "difficulty": "medium",
+      "pointValue": 100,
+      "question": "请听句子选正确翻译",
+      "options": [
+        "那本书是你的。",
+        "那本书是我的。",
+        "那本书是他的。",
+        "那本书是她的。"
+      ],
+      "answer": 0,
+      "explanation": "\"That book is yours.\"的翻译",
+      "textToSpeak": "That book is yours."
+    },
+    {
+      "id": "en-d5-l3",
+      "type": "listening",
+      "difficulty": "medium",
+      "pointValue": 100,
+      "question": "请听问句选正确回答",
+      "options": [
+        "It's mine.",
+        "It's my.",
+        "It's me.",
+        "It's I."
+      ],
+      "answer": 0,
+      "explanation": "\"Whose pen is this?\"的回答",
+      "textToSpeak": "Whose pen is this?"
+    },
+    {
+      "id": "en-d5-l4",
+      "type": "listening",
+      "difficulty": "medium",
+      "pointValue": 100,
+      "question": "请听句子选正确翻译",
+      "options": [
+        "这些书是我们的。",
+        "这些书是你们的。",
+        "这些书是他们的。",
+        "这些书是她的。"
+      ],
+      "answer": 0,
+      "explanation": "\"These books are ours.\"的翻译",
+      "textToSpeak": "These books are ours."
+    },
+    {
+      "id": "en-d5-l5",
+      "type": "listening",
+      "difficulty": "medium",
+      "pointValue": 100,
+      "question": "请听句子选正确翻译",
+      "options": [
+        "她的裙子是红色的。",
+        "他的衬衫是红色的。",
+        "我的鞋子是红色的。",
+        "你的帽子是红色的。"
+      ],
+      "answer": 0,
+      "explanation": "\"Her dress is red.\"的翻译",
+      "textToSpeak": "Her dress is red."
     },
     {
       "id": "en-d5-s1",
@@ -32242,6 +33078,5 @@ window.QUESTIONS = {
       "answerValue": "0.2",
       "explanation": "25*8=200，四位小数，0.25*0.8=0.200=0.2"
     }
-  ],
-  "math-day41": []
+  ]
 };
