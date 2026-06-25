@@ -252,15 +252,33 @@ const GameEngine = {
 
     let optionsHtml = '';
     const labels = ['A','B','C','D'];
+    var displayQ = q.question || '';
 
     if (stage.key === 'listening') {
       // 听力挑战——先播原声，再做选择题
-      var listenText = q.textToSpeak || q.question || '';
+      // 从题目中提取英文原句（引号内内容）用于TTS，显示只留提示
+      var rawQ = q.question || '';
+      // 匹配各种引号内的内容
+      var QUOTE_RE = /[""""]([^"""""]+)["""""]/;
+      var ALL_QUOTES_RE = /[""""][^"""""""]+[""""""]/g;
+      var listenMatch = rawQ.match(QUOTE_RE);
+      var listenText = q.textToSpeak || (listenMatch ? listenMatch[1] : rawQ) || '';
+      // 显示时隐藏英文原句，只保留听力提示
+      displayQ = rawQ
+        .replace(ALL_QUOTES_RE, '')
+        .replace(/[：:]\s*[，,]?\s*$/, '')
+        .replace(/[：:]\s*[，,]/, '，')
+        .replace(/^\s*[，,]+/, '')
+        .replace(/\s{2,}/g, ' ')
+        .trim();
+      // 兜底：如果还有残留引号，截断
+      var qIdx = displayQ.indexOf('"');
+      if (qIdx < 0) qIdx = displayQ.indexOf('\u201c');
+      if (qIdx < 0) qIdx = displayQ.indexOf("'");
+      if (qIdx > 3) displayQ = displayQ.substring(0, qIdx).trim();
+      if (!displayQ || displayQ.length < 4) displayQ = '请根据录音，选择正确翻译';
       optionsHtml = `
         <div style="text-align:center;padding:10px 0;animation:fadeIn .3s ease;">
-          <div style="font-size:18px;line-height:1.6;color:var(--text);margin:16px 0;padding:20px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:12px;font-weight:500;">
-            ${q.question}
-          </div>
           <div style="text-align:center;margin-bottom:12px;">
             <button class="btn btn-small btn-primary" onclick="GameEngine._playListenAudio()">
               🔊 播放声音
@@ -397,7 +415,7 @@ const GameEngine = {
         </div>
 
         <div class="question-text" style="font-size:17px;font-weight:500;line-height:1.7;padding:4px 0;">
-          ${q.question}
+          ${displayQ}
         </div>
 
         ${optionsHtml}

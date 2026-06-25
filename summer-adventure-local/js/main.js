@@ -106,11 +106,13 @@ const App = {
   // --- 初始化 ---
   init() {
     Auth.init();
+    // 强制使用热战题库（已替换旧题库，删除了questions.js）
+    window.QUESTIONS = window.QUESTIONS_REZHAN || {};
     this.router();
     window.addEventListener('hashchange', () => this.router());
   },
 
-  // --- 路由 ---
+  // ==================== 路由 ====================
   router() {
     const hash = window.location.hash.slice(1) || 'login';
     const parts = hash.split('/');
